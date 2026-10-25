@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Noto_Sans_Bengali, Plus_Jakarta_Sans } from "next/font/google";
-import { Providers } from "@/components/providers";
+import { Providers } from "@/providers";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
