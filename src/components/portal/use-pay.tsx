@@ -7,6 +7,7 @@ import { newId, useData } from "@/components/data-provider";
 import { UTILITY_LABELS } from "@/data/utilities";
 import { formatMonth, MOCK_NOW } from "@/lib/format";
 import { useTenant } from "@/hooks/use-tenant";
+import { useConfirmRentMutation } from "@/hooks/usePayment";
 import type { Payment, UtilityBill, UtilitySplit } from "@/types";
 
 export type PayTarget =
@@ -35,6 +36,7 @@ function describe(t: PayTarget): CheckoutItem {
 export function usePay() {
   const d = useData();
   const t = useTenant();
+  const confirmRent = useConfirmRentMutation();
   const [target, setTarget] = React.useState<PayTarget | null>(null);
   const [open, setOpen] = React.useState(false);
 
@@ -48,6 +50,11 @@ export function usePay() {
     const paidAt = MOCK_NOW.toISOString();
     if (target.kind === "payment") {
       const p = target.payment;
+      confirmRent.mutate({
+        paymentId: p.id,
+        transactionId: trxId,
+        paymentMethod: "BKASH",
+      });
       d.setPayments((prev) =>
         prev.map((x) => (x.id === p.id ? { ...x, status: "PAID", bkashTrxId: trxId, bkashNumber: number, paidAt } : x)),
       );

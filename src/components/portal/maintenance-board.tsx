@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLookup } from "@/hooks/use-lookup";
 import { useMockQuery } from "@/hooks/use-mock-query";
+import { useUpdateMaintenanceStatusMutation } from "@/hooks/useMaintenance";
 import { MOCK_NOW, timeAgo } from "@/lib/format";
 import type { MaintenanceTicket, Role, TicketStatus } from "@/types";
 
@@ -41,6 +42,7 @@ export function MaintenanceBoard({
 }) {
   const d = useData();
   const look = useLookup();
+  const updateMutation = useUpdateMaintenanceStatusMutation();
   const { status, retry } = useMockQuery(null);
   const [q, setQ] = React.useState("");
   const [st, setSt] = React.useState("ALL");
@@ -57,6 +59,7 @@ export function MaintenanceBoard({
 
   const update = (t: MaintenanceTicket, next: TicketStatus) => {
     if (next === t.status) return;
+    updateMutation.mutate({ id: t.id, status: next as any });
     d.setTickets((prev) => prev.map((x) => (x.id === t.id ? { ...x, status: next, updatedAt: MOCK_NOW.toISOString() } : x)));
     d.audit({ actorId: actor.id, actorName: actor.name, actorRole: actor.role, action: "UPDATE", entity: "MaintenanceTicket", entityId: t.id, summary: `${actor.name} set "${t.title}" to ${next.toLowerCase().replace("_", " ")}` });
     d.notify({ userId: t.tenantId, kind: "MAINTENANCE", title: "Ticket updated", body: `"${t.title}" is now ${next.toLowerCase().replace("_", " ")}.`, href: `/tenant/maintenance/${t.id}` });

@@ -6,3 +6,6 @@ export * from "./room.api";
 export * from "./viewing.api";
 export * from "./application.api";
 export * from "./lease.api";
+export * from "./maintenance.api";
+export * from "./utility.api";
+export * from "./payment.api";
