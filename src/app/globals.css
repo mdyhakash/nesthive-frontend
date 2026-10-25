@@ -1,0 +1,330 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ------------------------------------------------------------------ */
+/* Design tokens — NestHive                                            */
+/* ------------------------------------------------------------------ */
+:root {
+  --radius: 1rem;
+
+  --background: #fafaf7;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+
+  --primary: #f5a524; /* Hive Amber */
+  --primary-hover: #e0920f;
+  --primary-foreground: #1a1203;
+
+  --secondary: #0f766e; /* Deep Teal */
+  --secondary-hover: #115e59;
+  --secondary-foreground: #ffffff;
+
+  --muted: #f3f2ec;
+  --muted-foreground: #6b7280;
+  --accent: #f3f2ec;
+  --accent-foreground: #111827;
+
+  --amber-soft: #fff7e6;
+  --teal-soft: #e6f4f2;
+
+  --border: #e7e5dc;
+  --input: #e7e5dc;
+  --ring: #0f766e;
+
+  /* Semantic: solid / soft tint / strong text */
+  --success: #16a34a;
+  --success-soft: rgb(22 163 74 / 0.12);
+  --success-strong: #15803d;
+  --warning: #f59e0b;
+  --warning-soft: rgb(245 158 11 / 0.14);
+  --warning-strong: #b45309;
+  --danger: #dc2626;
+  --danger-soft: rgb(220 38 38 / 0.1);
+  --danger-strong: #b91c1c;
+  --info: #2563eb;
+  --info-soft: rgb(37 99 235 / 0.1);
+  --info-strong: #1d4ed8;
+  --neutral-soft: rgb(107 114 128 / 0.14);
+  --neutral-strong: #4b5563;
+
+  --bkash: #e2136e;
+  --bkash-soft: rgb(226 19 110 / 0.1);
+
+  --chart-1: #0f766e;
+  --chart-2: #f5a524;
+  --chart-3: #2563eb;
+  --chart-4: #dc2626;
+  --chart-5: #7c3aed;
+}
+
+.dark {
+  --background: #0b0f14;
+  --foreground: #f3f4f6;
+  --card: #121821;
+  --card-foreground: #f3f4f6;
+  --popover: #121821;
+  --popover-foreground: #f3f4f6;
+
+  --primary: #ffb84d;
+  --primary-hover: #ffc56b;
+  --primary-foreground: #1a1203;
+
+  --secondary: #2dd4bf;
+  --secondary-hover: #5eead4;
+  --secondary-foreground: #04201c;
+
+  --muted: #1a222d;
+  --muted-foreground: #9ca3af;
+  --accent: #1a222d;
+  --accent-foreground: #f3f4f6;
+
+  --amber-soft: rgb(255 184 77 / 0.12);
+  --teal-soft: rgb(45 212 191 / 0.12);
+
+  --border: #243040;
+  --input: #243040;
+  --ring: #2dd4bf;
+
+  --success: #22c55e;
+  --success-soft: rgb(34 197 94 / 0.16);
+  --success-strong: #4ade80;
+  --warning: #f59e0b;
+  --warning-soft: rgb(245 158 11 / 0.16);
+  --warning-strong: #fbbf24;
+  --danger: #ef4444;
+  --danger-soft: rgb(239 68 68 / 0.16);
+  --danger-strong: #f87171;
+  --info: #3b82f6;
+  --info-soft: rgb(59 130 246 / 0.16);
+  --info-strong: #60a5fa;
+  --neutral-soft: rgb(156 163 175 / 0.14);
+  --neutral-strong: #9ca3af;
+
+  --bkash: #f0408c;
+  --bkash-soft: rgb(240 64 140 / 0.14);
+
+  --chart-1: #2dd4bf;
+  --chart-2: #ffb84d;
+  --chart-3: #60a5fa;
+  --chart-4: #f87171;
+  --chart-5: #a78bfa;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-amber-soft: var(--amber-soft);
+  --color-teal-soft: var(--teal-soft);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--danger);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-strong: var(--success-strong);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-strong: var(--warning-strong);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-strong: var(--danger-strong);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-strong: var(--info-strong);
+  --color-neutral-soft: var(--neutral-soft);
+  --color-neutral-strong: var(--neutral-strong);
+  --color-bkash: var(--bkash);
+  --color-bkash-soft: var(--bkash-soft);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  /*
+    Font stacks. Inter / Plus Jakarta Sans / JetBrains Mono have no Bengali
+    glyphs, so the taka sign (U+09F3) falls through to a Bengali-capable font:
+    next/font Noto Sans Bengali first, then common system Bengali fonts.
+  */
+  --font-sans: var(--font-inter), var(--font-bengali), "Nirmala UI", "Bangla Sangam MN",
+    "Noto Sans Bengali", "Kohinoor Bangla", system-ui, sans-serif;
+  --font-heading: var(--font-jakarta), var(--font-bengali), "Nirmala UI", "Bangla Sangam MN",
+    "Noto Sans Bengali", "Kohinoor Bangla", system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), var(--font-bengali), "Nirmala UI", "Bangla Sangam MN",
+    "Noto Sans Bengali", ui-monospace, SFMono-Regular, monospace;
+
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  --animate-marquee: marquee 60s linear infinite;
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  --animate-accordion-down: accordion-down 0.25s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    font-weight: 700;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+/* Type scale: hero 36/64, h2 28/40, body 16, small 14, caption 12 */
+@utility text-hero {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  font-size: 36px;
+  @media (min-width: 1024px) {
+    font-size: 64px;
+  }
+}
+
+@utility text-section {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  font-size: 28px;
+  @media (min-width: 1024px) {
+    font-size: 40px;
+  }
+}
+
+@utility text-caption {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@utility num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+@utility glass {
+  background: color-mix(in srgb, var(--background) 72%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+}
+
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility hive-glow {
+  background-image: radial-gradient(
+    60% 60% at 50% 40%,
+    color-mix(in srgb, var(--primary) 32%, transparent) 0%,
+    color-mix(in srgb, #f97316 14%, transparent) 45%,
+    transparent 75%
+  );
+}
+
+@utility skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    color-mix(in srgb, var(--muted) 55%, var(--card)) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .skeleton-shimmer {
+    animation: none;
+  }
+}
