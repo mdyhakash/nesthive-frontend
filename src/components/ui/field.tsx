@@ -7,17 +7,19 @@ import { Label } from "@/components/ui/label";
 interface FieldProps {
   label: string;
   /** Optional hint shown under the control. */
-  hint?: string;
+  hint?: React.ReactNode;
   /** Validation message (e.g. react-hook-form `errors.x?.message`). */
   error?: string;
   required?: boolean;
   className?: string;
-  /** Render function receives ids/aria props to spread on the control. */
-  children: (props: {
-    id: string;
-    "aria-invalid": boolean;
-    "aria-describedby": string | undefined;
-  }) => React.ReactNode;
+  /** React node or render function that receives ids/aria props */
+  children:
+    | React.ReactNode
+    | ((props: {
+        id: string;
+        "aria-invalid": boolean;
+        "aria-describedby": string | undefined;
+      }) => React.ReactNode);
 }
 
 /**
@@ -41,7 +43,9 @@ export function Field({ label, hint, error, required, className, children }: Fie
           </span>
         )}
       </Label>
-      {children({ id, "aria-invalid": !!error, "aria-describedby": describedBy })}
+      {typeof children === "function"
+        ? (children as Function)({ id, "aria-invalid": !!error, "aria-describedby": describedBy })
+        : children}
       {hint && !error && (
         <p id={hintId} className="text-xs text-muted-foreground">
           {hint}

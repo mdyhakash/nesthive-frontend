@@ -14,8 +14,8 @@ function GoogleG() {
   );
 }
 
-/** Non-functional by design: shows a toast explaining this is a UI-only demo. */
-export function GoogleButton({ label = "Continue with Google" }: { label?: string }) {
+export function GoogleButton({ label, action }: { label?: string; action?: string }) {
+  const displayLabel = label || (action ? `${action} with Google` : "Continue with Google");
   return (
     <Button
       type="button"
@@ -25,16 +25,16 @@ export function GoogleButton({ label = "Continue with Google" }: { label?: strin
       onClick={() => toast.info("Google sign-in isn't available in this demo", { description: "Use the demo accounts below instead." })}
     >
       <GoogleG />
-      {label}
+      {displayLabel}
     </Button>
   );
 }
 
-export function OrDivider() {
+export function OrDivider({ label = "or" }: { label?: string }) {
   return (
-    <div className="my-6 flex items-center gap-4 text-sm text-muted-foreground" role="separator" aria-label="or">
+    <div className="my-6 flex items-center gap-4 text-sm text-muted-foreground" role="separator" aria-label={label}>
       <span className="h-px flex-1 bg-border" />
-      or
+      {label}
       <span className="h-px flex-1 bg-border" />
     </div>
   );

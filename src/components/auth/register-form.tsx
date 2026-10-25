@@ -2,10 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { GoogleButton, OrDivider } from "@/components/auth/google-button";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { registerSchema, type RegisterValues } from "@/lib/validation";
+import { useRegisterMutation } from "@/hooks/useAuthMutations";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ROLE_OPTIONS = [
@@ -21,13 +22,14 @@ const ROLE_OPTIONS = [
 ] as const;
 
 export function RegisterForm() {
-  const router = useRouter();
   const params = useSearchParams();
+  const registerMutation = useRegisterMutation();
+
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -41,10 +43,13 @@ export function RegisterForm() {
     },
   });
 
-  const onSubmit = async (v: RegisterValues) => {
-    await new Promise((r) => setTimeout(r, 500));
-    toast.success("Account created", { description: "We sent a 6-digit code to " + v.email });
-    router.push(`/verify-email?email=${encodeURIComponent(v.email)}`);
+  const onSubmit = (v: RegisterValues) => {
+    registerMutation.mutate({
+      name: v.name,
+      email: v.email,
+      phone: v.phone,
+      password: v.password,
+    });
   };
 
   return (
@@ -58,22 +63,22 @@ export function RegisterForm() {
           name="role"
           render={({ field }) => (
             <div role="radiogroup" aria-label="Account type" className="grid gap-2 sm:grid-cols-2">
-              {ROLE_OPTIONS.map((o) => {
-                const active = field.value === o.value;
+              {ROLE_OPTIONS.map((opt) => {
+                const checked = field.value === opt.value;
                 return (
                   <button
-                    key={o.value}
                     type="button"
                     role="radio"
-                    aria-checked={active}
-                    onClick={() => field.onChange(o.value)}
+                    key={opt.value}
+                    aria-checked={checked}
+                    onClick={() => field.onChange(opt.value)}
                     className={cn(
-                      "min-h-16 rounded-2xl border p-3 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
-                      active ? "border-secondary bg-teal-soft" : "border-border bg-card hover:bg-muted",
+                      "flex flex-col items-start rounded-2xl border p-4 text-left transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      checked ? "border-primary bg-amber-soft/50 dark:bg-amber-soft/20" : "border-border hover:bg-muted",
                     )}
                   >
-                    <span className="block text-sm font-semibold">{o.label}</span>
-                    <span className="text-xs text-muted-foreground">{o.hint} account</span>
+                    <span className="text-sm font-bold">{opt.label}</span>
+                    <span className="text-xs text-muted-foreground">{opt.hint}</span>
                   </button>
                 );
               })}
@@ -81,59 +86,77 @@ export function RegisterForm() {
           )}
         />
 
-        <Field label="Full name" required error={errors.name?.message}>
-          {(a) => <Input autoComplete="name" {...a} {...register("name")} />}
+        <Field label="Full name" error={errors.name?.message}>
+          <Input placeholder="Rahim Ahmed" disabled={registerMutation.isPending} {...register("name")} />
         </Field>
-        <Field label="Email" required error={errors.email?.message}>
-          {(a) => <Input type="email" inputMode="email" autoComplete="email" {...a} {...register("email")} />}
+
+        <Field label="Email" error={errors.email?.message}>
+          <Input type="email" placeholder="you@example.com" disabled={registerMutation.isPending} {...register("email")} />
         </Field>
-        <Field label="Mobile number" required hint="We use this for bKash payments and viewing updates." error={errors.phone?.message}>
-          {(a) => <Input type="tel" inputMode="tel" autoComplete="tel" placeholder="01712-345678" {...a} {...register("phone")} />}
+
+        <Field label="Phone number" error={errors.phone?.message} hint="Used for viewing coordination & SMS OTP">
+          <Input type="tel" placeholder="017XXXXXXXX" disabled={registerMutation.isPending} {...register("phone")} />
         </Field>
-        <Field label="Password" required hint="At least 8 characters with a letter and a number." error={errors.password?.message}>
-          {(a) => <PasswordInput autoComplete="new-password" {...a} {...register("password")} />}
+
+        <Field label="Password" error={errors.password?.message} hint="At least 8 characters">
+          <PasswordInput placeholder="••••••••" disabled={registerMutation.isPending} {...register("password")} />
         </Field>
-        <Field label="Confirm password" required error={errors.confirm?.message}>
-          {(a) => <PasswordInput autoComplete="new-password" {...a} {...register("confirm")} />}
+
+        <Field label="Confirm password" error={errors.confirm?.message}>
+          <PasswordInput placeholder="••••••••" disabled={registerMutation.isPending} {...register("confirm")} />
         </Field>
 
         <Controller
           control={control}
           name="terms"
           render={({ field }) => (
-            <div className="grid gap-1.5">
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  id="terms"
-                  checked={field.value}
-                  onCheckedChange={(c) => field.onChange(c === true)}
-                  aria-invalid={!!errors.terms}
-                  className="mt-0.5"
-                />
-                <label htmlFor="terms" className="text-sm leading-snug">
-                  I agree to the NestHive terms of use and privacy policy.
-                </label>
-              </div>
-              {errors.terms && (
-                <p role="alert" className="text-xs font-medium text-danger-strong">
-                  {errors.terms.message}
-                </p>
-              )}
+            <div className="flex items-start gap-2">
+              <Checkbox
+                id="terms"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                aria-invalid={!!errors.terms}
+                disabled={registerMutation.isPending}
+              />
+              <label htmlFor="terms" className="text-sm text-muted-foreground leading-snug">
+                I agree to the{" "}
+                <Link href="#" className="underline-offset-4 hover:underline text-foreground">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="#" className="underline-offset-4 hover:underline text-foreground">
+                  Privacy Policy
+                </Link>
+                .
+              </label>
             </div>
           )}
         />
+        {errors.terms && <p className="text-xs font-medium text-danger">{errors.terms.message}</p>}
 
-        <Button type="submit" size="lg" disabled={isSubmitting}>
-          {isSubmitting ? "Creating account…" : "Create account"}
+        <Button type="submit" size="lg" className="w-full" disabled={registerMutation.isPending}>
+          {registerMutation.isPending ? (
+            <>
+              <Loader2 className="size-4 animate-spin mr-2" />
+              Creating account...
+            </>
+          ) : (
+            "Create account"
+          )}
         </Button>
       </form>
 
-      <OrDivider />
-      <GoogleButton label="Sign up with Google" />
+      <div className="mt-6">
+        <OrDivider label="or sign up with" />
+      </div>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <div className="mt-6">
+        <GoogleButton action="Sign up" />
+      </div>
+
+      <p className="mt-8 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-secondary underline-offset-4 hover:underline">
+        <Link href="/login" className="font-semibold text-foreground underline-offset-4 hover:underline">
           Log in
         </Link>
       </p>
