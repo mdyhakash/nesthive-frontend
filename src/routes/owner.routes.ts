@@ -1,0 +1,17 @@
+export const OWNER_ROUTES = {
+  DASHBOARD: "/owner",
+  PROPERTIES: "/owner/properties",
+  PROPERTIES_NEW: "/owner/properties/new",
+  PROPERTIES_EDIT: (id: string) => `/owner/properties/${id}/edit`,
+  PROPERTIES_ROOMS: (id: string) => `/owner/properties/${id}/rooms`,
+  APPLICATIONS: "/owner/applications",
+  LEASES: "/owner/leases",
+  PAYMENTS: "/owner/payments",
+  UTILITIES: "/owner/utilities",
+  MAINTENANCE: "/owner/maintenance",
+  VIEWINGS: "/owner/viewings",
+  MANAGERS: "/owner/managers",
+  KYC: "/owner/kyc",
+  NOTIFICATIONS: "/owner/notifications",
+  PROFILE: "/owner/profile",
+} as const;
