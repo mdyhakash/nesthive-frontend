@@ -8,4 +8,5 @@ export * from "./use-lookup";
 export * from "./use-tenant";
 export * from "./useTenantPortal";
 export * from "./use-owner";
+export * from "./useOwnerPortal";
 export * from "./use-manager";

@@ -11,11 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLookup } from "@/hooks/use-lookup";
 import { useMockQuery } from "@/hooks/use-mock-query";
-import { useOwner } from "@/hooks/use-owner";
+import { useOwnerPortal } from "@/hooks/useOwnerPortal";
 import { formatBDT, timeAgo } from "@/lib/format";
 
 export default function OwnerDashboard() {
-  const o = useOwner();
+  const o = useOwnerPortal();
   const look = useLookup();
   const { status, retry } = useMockQuery(null);
 

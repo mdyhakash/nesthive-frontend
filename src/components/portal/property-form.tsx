@@ -19,7 +19,7 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { AMENITIES, AREAS, PROPERTY_TYPES } from "@/data/properties";
-import { useOwner } from "@/hooks/use-owner";
+import { useOwnerPortal } from "@/hooks/useOwnerPortal";
 import { MOCK_NOW } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Property, PropertyType } from "@/types";
@@ -46,11 +46,11 @@ const STEPS = [
   { title: "Amenities", fields: ["amenities"] },
 ] as const;
 
-/** Four-step create / edit form for a property. Nothing is sent anywhere; the in-memory store is updated. */
+/** Four-step create / edit form for a property. */
 export function PropertyForm({ property }: { property?: Property }) {
   const router = useRouter();
   const d = useData();
-  const o = useOwner();
+  const o = useOwnerPortal();
   const kycOk = o.owner.kycStatus === "APPROVED";
   const [step, setStep] = React.useState(0);
   const [dir, setDir] = React.useState(1);
@@ -110,12 +110,34 @@ export function PropertyForm({ property }: { property?: Property }) {
   const save = (mode: "draft" | "publish") =>
     handleSubmit(async (v) => {
       setSaving(mode);
-      await new Promise((r) => setTimeout(r, 600));
       const status = mode === "publish" ? "PUBLISHED" : (property?.status ?? "DRAFT");
       if (property) {
+        o.updatePropertyMutation.mutate({
+          id: property.id,
+          data: {
+            title: v.title,
+            description: v.description,
+            address: v.address,
+            city: "Dhaka",
+            area: v.area,
+            type: "APARTMENT",
+            amenities: v.amenities,
+            images,
+          },
+        });
         d.setProperties((prev) => prev.map((p) => (p.id === property.id ? { ...p, ...v, type: v.type as PropertyType, images, status } : p)));
         d.audit({ actorId: o.owner.userId, actorName: o.owner.name, actorRole: "OWNER", action: mode === "publish" ? "PUBLISH" : "UPDATE", entity: "Property", entityId: property.id, summary: `${o.owner.name} ${mode === "publish" ? "published" : "updated"} ${v.title}` });
       } else {
+        o.createPropertyMutation.mutate({
+          title: v.title,
+          description: v.description,
+          address: v.address,
+          city: "Dhaka",
+          area: v.area,
+          type: "APARTMENT",
+          amenities: v.amenities,
+          images,
+        });
         const id = newId("p");
         const created: Property = {
           id,

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMockQuery } from "@/hooks/use-mock-query";
-import { useOwner } from "@/hooks/use-owner";
+import { useOwnerPortal } from "@/hooks/useOwnerPortal";
 import { formatBDT } from "@/lib/format";
 import type { Property } from "@/types";
 
@@ -25,7 +25,7 @@ const NONE = "none";
 
 export default function OwnerProperties() {
   const d = useData();
-  const o = useOwner();
+  const o = useOwnerPortal();
   const { status, retry } = useMockQuery(null);
   const [q, setQ] = React.useState("");
   const [state, setState] = React.useState("ALL");
@@ -42,6 +42,7 @@ export default function OwnerProperties() {
 
   const togglePublish = (p: Property) => {
     const next = p.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+    o.publishPropertyMutation.mutate(p.id);
     d.setProperties((prev) => prev.map((x) => (x.id === p.id ? { ...x, status: next } : x)));
     d.audit({ actorId: o.owner.userId, actorName: o.owner.name, actorRole: "OWNER", action: "PUBLISH", entity: "Property", entityId: p.id, summary: `${o.owner.name} ${next === "PUBLISHED" ? "published" : "unpublished"} ${p.title}` });
     toast.success(next === "PUBLISHED" ? "Property published" : "Moved back to draft");
@@ -49,6 +50,7 @@ export default function OwnerProperties() {
 
   const remove = () => {
     if (!del) return;
+    o.deletePropertyMutation.mutate(del.id);
     d.setProperties((prev) => prev.map((x) => (x.id === del.id ? { ...x, isDeleted: true, status: "DRAFT" } : x)));
     d.audit({ actorId: o.owner.userId, actorName: o.owner.name, actorRole: "OWNER", action: "DELETE", entity: "Property", entityId: del.id, summary: `${o.owner.name} deleted ${del.title}` });
     toast.success("Property deleted", { description: "It was soft-deleted and hidden from Browse." });
