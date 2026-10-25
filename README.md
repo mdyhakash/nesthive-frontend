@@ -1,55 +1,127 @@
-# NestHive (UI only)
+# 🏠 NestHive — Fullstack Housing & Roommate Platform
 
-Housing & roommate management platform for renters and owners in Bangladesh.
-**This is a front-end-only build.** There are no API calls, no real auth, no env vars and no database.
-Everything runs on mock data held in React state, so a page reload resets the demo.
+Modern, fullstack-ready housing and roommate discovery and management platform built with **Next.js (App Router)**, **TanStack Query (React Query)**, **Axios**, **Zustand**, and **Tailwind CSS**. Built according to Programming Hero B7A7 specifications and integrated with the live NestHive Backend API.
 
-Stack: Next.js (App Router) · TypeScript · Tailwind CSS v4 · shadcn-style components (Radix) · lucide-react · sonner · framer-motion · next-themes · react-hook-form + zod · recharts.
+---
 
-```bash
-npm install --legacy-peer-deps
-npm run dev      # http://localhost:3000
-npm run build && npm start
-npm run lint
+## 🌟 Live Links & API References
+
+- **Live Backend API**: [https://nesthive-backend.vercel.app/api/v1](https://nesthive-backend.vercel.app/api/v1)
+- **API Documentation (Swagger UI)**: [https://nesthive-backend.vercel.app/api-docs](https://nesthive-backend.vercel.app/api-docs)
+
+---
+
+## 🚀 Key Features
+
+- **Decoupled Architecture**: Strict separation of concerns — **zero business logic in components**. All server queries, mutations, filtering and state updates are encapsulated in custom hooks (`src/hooks/`).
+- **Data Fetching & Cache Management**: **TanStack Query (React Query v5)** with custom query key factories and cache invalidation.
+- **HTTP Client**: Centralized Axios client (`src/api/client.ts`) with Bearer token request interceptor and unified error handling.
+- **State Management**: **Zustand** stores (`src/store/auth.store.ts`, `src/store/ui.store.ts`) with `localStorage` persistence.
+- **Centralized Route Constants**: Role-based route definitions in `src/routes/` (`public`, `auth`, `tenant`, `owner`, `admin`).
+- **Form Validation**: **React Hook Form + Zod** schemas for robust, accessible type-safe validations.
+- **One-Click Quick Demo Login**: Instant login buttons for **Admin**, **Owner**, and **Manager** directly executing live API requests with token storage.
+- **Multi-Role Portals**: Complete dashboard workflows for Tenant, Property Owner, Manager, and Platform Admin.
+- **Fintech Integration**: Full bKash mobile banking checkout simulation for rent, security deposits, and utility bill splits.
+
+---
+
+## 🔑 Demo Credentials (Live API Connected)
+
+| Role | Email | Password | Quick Action |
+|:---|:---|:---|:---|
+| **Admin** | `admin@gmail.com` | `Admin123@` | 1-Click Demo Button on `/login` |
+| **Owner** | `owner@gmail.com` | `Owner123@` | 1-Click Demo Button on `/login` |
+| **Manager** | `manager@gmail.com` | `Manager123@` | 1-Click Demo Button on `/login` |
+| **Tenant** | Demo session / Register | Any valid password | Sign up or test as renter |
+
+---
+
+## 🏗️ Project Architecture & Folder Structure
+
+Following strict architectural conventions:
+```
+nesthive-frontend/
+├── src/
+│   ├── api/                   # File-based API services (Axios client)
+│   │   ├── client.ts          # Central Axios instance with interceptors
+│   │   ├── auth.api.ts        # Login, register, profile, change password
+│   │   ├── user.api.ts        # User query and status updates
+│   │   ├── property.api.ts    # Property CRUD, filtering, pagination
+│   │   ├── room.api.ts        # Room CRUD and assignment
+│   │   ├── viewing.api.ts     # Viewing requests and scheduling
+│   │   ├── application.api.ts # Rental applications and approvals
+│   │   ├── lease.api.ts       # Tenant and owner leases
+│   │   ├── maintenance.api.ts # Maintenance ticket lifecycle
+│   │   ├── utility.api.ts     # Utility bills and split payments
+│   │   ├── payment.api.ts     # Rent, deposit & bKash transactions
+│   │   ├── admin.api.ts       # Platform overview, KYC and audit logs
+│   │   └── index.ts           # Unified API export
+│   ├── hooks/                 # Custom Hooks (ALL business logic lives here)
+│   │   ├── useAuthMutations.ts# Login, registration, password mutations
+│   │   ├── useUserProfile.ts  # Current authenticated user profile
+│   │   ├── useProperties.ts   # Property TanStack queries & mutations
+│   │   ├── useRooms.ts        # Room queries & mutations
+│   │   ├── useBrowse.ts       # Discovery, search, filter and pagination
+│   │   ├── useTenantPortal.ts # Tenant leases, applications & viewings
+│   │   ├── useOwnerPortal.ts  # Owner properties, leases & applications
+│   │   ├── useMaintenance.ts  # Maintenance tickets
+│   │   ├── usePayment.ts      # Rent & bKash payments
+│   │   ├── useAdmin.ts        # Admin overview, KYC approval & user block
+│   │   └── index.ts           # Unified hooks export
+│   ├── store/                 # Zustand state management
+│   │   ├── auth.store.ts      # Authentication tokens and user profile
+│   │   ├── ui.store.ts        # Theme, sidebar and drawer states
+│   │   └── index.ts
+│   ├── providers/             # Global application providers
+│   │   ├── query-provider.tsx # TanStack QueryClientProvider & DevTools
+│   │   ├── theme-provider.tsx # next-themes Dark/Light mode provider
+│   │   └── index.tsx          # Combined root providers wrapper
+│   ├── routes/                # Centralized role-based route paths
+│   │   ├── public.routes.ts   # Public marketing routes
+│   │   ├── auth.routes.ts     # Authentication routes
+│   │   ├── tenant.routes.ts   # Tenant portal routes
+│   │   ├── owner.routes.ts    # Owner portal routes
+│   │   ├── admin.routes.ts    # Admin portal routes
+│   │   └── index.ts
+│   ├── components/            # Pure presentational UI components
+│   │   ├── auth/              # Login, register, verify forms
+│   │   ├── marketing/         # Landing, browse and room cards
+│   │   ├── portal/            # Sidebar, topbar, maintenance, forms
+│   │   ├── shared/            # Data tables, stat cards, empty states
+│   │   └── ui/                # Accessible Radix primitives
+│   ├── types/                 # TypeScript interfaces and API schemas
+│   └── app/                   # Next.js App Router layout and pages
 ```
 
-## Demo logins
-Open `/login`, pick a role and use the quick-fill buttons (password `demo1234`, email code `123456`).
-Inside the portal, the floating flask button switches role and turns on **Show error states**.
+---
 
-| Role | Demo user | Lands on |
-|---|---|---|
-| Tenant | Rafiq Ahmed | `/tenant` |
-| Owner | Kamal Uddin (KYC approved) | `/owner` |
-| Manager | Habibur Rahman | `/manager` |
-| Admin | Tahmina Akter | `/admin` |
+## 🛠️ Setup & Local Development
 
-bKash checkout (tenant → Payments): PIN `12345` succeeds, `00000` fails (insufficient balance), OTP `123456`.
-To see the "KYC not approved" states, submit new documents as the owner (`/owner/kyc` → Update documents), or reject the owner as admin.
+### 1. Clone the repository
+```bash
+git clone https://github.com/mdyhakash/nesthive-frontend.git
+cd nesthive-frontend
+```
 
-## Routes
-**Public:** `/` · `/browse` · `/browse/[id]` · `/browse/[id]/rooms/[roomId]` · `/how-it-works` · `/for-tenants` · `/for-owners` · `/about` · `/contact` · `/faq`
-**Auth:** `/login` · `/register` · `/verify-email` · `/forgot-password` · `/reset-password`
-**Tenant:** `/tenant` · `/tenant/roommates` · `/tenant/viewings` · `/tenant/applications` · `/tenant/lease` · `/tenant/payments` · `/tenant/utilities` · `/tenant/maintenance` (+ `/new`, `/[id]`) · `/tenant/notifications` · `/tenant/profile`
-**Owner:** `/owner` · `/owner/kyc` · `/owner/properties` (+ `/new`, `/[id]/edit`, `/[id]/rooms`) · `/owner/viewings` · `/owner/applications` · `/owner/leases` · `/owner/payments` · `/owner/utilities` · `/owner/maintenance` · `/owner/managers` · `/owner/notifications` · `/owner/profile`
-**Manager:** `/manager` · `/manager/properties` · `/manager/maintenance` · `/manager/leases` · `/manager/notifications` · `/manager/profile`
-**Admin:** `/admin` · `/admin/kyc` · `/admin/users` · `/admin/payments` · `/admin/leases` · `/admin/maintenance` · `/admin/audit` · `/admin/notifications` · `/admin/profile`
+### 2. Environment Variables
+Create a `.env.local` file in the root directory:
+```env
+NEXT_PUBLIC_API_URL=https://nesthive-backend.vercel.app/api/v1
+```
 
-## Where things live
-- **Mock data:** `src/data/*.ts` (users, properties, rooms, activity = viewings/applications/leases/payments, utilities, maintenance, notifications, audit, roommates, marketing copy, analytics). Types in `src/types/index.ts`.
-- **Live store:** `src/components/data-provider.tsx` copies the seed data into React state so actions (approve, pay, cancel…) show up across pages and roles. `useMockQuery` (`src/hooks/use-mock-query.ts`) gives every list its 600 ms skeleton, empty and error states.
-- **Mock auth:** `src/components/auth-provider.tsx` (role in `localStorage` key `nesthive.role`).
-- **Portal shell:** `src/components/portal/` (sidebar, top bar, mobile bottom nav, role switcher, bKash checkout, shared record views). Nav per role: `src/lib/nav.ts`.
-- **Motion:** `src/lib/motion.ts`, `src/app/template.tsx`, `MotionConfig reducedMotion="user"` in `providers.tsx`.
-- **Formatting:** `src/lib/format.ts` (`formatBDT` → ৳18,000 with lakh grouping, Dhaka dates; the mock "now" is 21 Oct 2026).
+### 3. Install dependencies
+```bash
+npm install --legacy-peer-deps
+```
 
-## Design tokens (`src/app/globals.css`)
-Light: background `#FCFCFB`, card `#FFFFFF`, foreground `#16181D`, primary (amber) `#F5A524`, secondary (teal) `#0F766E`. Dark: background `#0B0F14`, card `#131920`, foreground `#EAEDF1`, primary `#FFB84D`, secondary `#2DD4BF`.
-Semantic soft/strong pairs for success, warning, danger and info; chart colors `--chart-1…5`; bKash pink (`--bkash`) appears **only** on bKash screens.
-Fonts (next/font/google): Plus Jakarta Sans 600/700/800 for headings (-0.02em), Inter 400/500/600 for body, JetBrains Mono for numbers and IDs (`.num`, tabular). Noto Sans Bengali is a fallback so ৳ always renders.
-Type scale: hero 36/64, h2 28/40, body 16, small 14, caption 12. Radius 12 / 16 / 24.
+### 4. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-## Notes
-- Photos come from Unsplash through `next/image`; a tinted fallback shows if one fails to load.
-- Admin charts use the brand chart colors; each has a legend, tooltips and a **Table** toggle so values never rely on color alone.
-- Uploads (KYC, tickets, property photos, avatar) are previewed locally with object URLs and never sent anywhere.
+### 5. Production Build Verification
+```bash
+npm run build
+npm start
+```
