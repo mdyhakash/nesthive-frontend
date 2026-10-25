@@ -6,5 +6,6 @@ export * from "./useBrowse";
 export * from "./use-mock-query";
 export * from "./use-lookup";
 export * from "./use-tenant";
+export * from "./useTenantPortal";
 export * from "./use-owner";
 export * from "./use-manager";

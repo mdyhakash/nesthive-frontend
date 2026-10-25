@@ -14,7 +14,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { useMockQuery } from "@/hooks/use-mock-query";
 import { useLookup } from "@/hooks/use-lookup";
-import { useTenant } from "@/hooks/use-tenant";
+import { useTenantPortal } from "@/hooks/useTenantPortal";
 import { formatBDT, formatDate } from "@/lib/format";
 import { listItemProps } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -51,18 +51,19 @@ function Dot({ state }: { state: StepState }) {
 
 export default function TenantApplications() {
   const d = useData();
-  const t = useTenant();
+  const t = useTenantPortal();
   const look = useLookup();
   const { status, retry } = useMockQuery(null);
   const [withdrawId, setWithdrawId] = React.useState<string | null>(null);
 
-  const rows = [...t.applications].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const rows = [...(t.applications as any[])].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   const withdraw = () => {
-    const a = t.applications.find((x) => x.id === withdrawId);
+    const a = (t.applications as any[]).find((x) => x.id === withdrawId);
     if (!a) return;
-    d.setApplications((prev) => prev.map((x) => (x.id === a.id ? { ...x, status: "WITHDRAWN", updatedAt: new Date("2026-10-21T18:30:00Z").toISOString() } : x)));
-    d.audit({ actorId: t.id, actorName: a.tenantName, actorRole: "TENANT", action: "UPDATE", entity: "Application", entityId: a.id, summary: `${a.tenantName} withdrew an application` });
+    t.withdrawApplication(a.id);
+    d.setApplications((prev) => prev.map((x) => (x.id === a.id ? { ...x, status: "WITHDRAWN", updatedAt: new Date().toISOString() } : x)));
+    d.audit({ actorId: t.user?.id || "demo-tenant", actorName: a.tenantName || t.user?.name || "Tenant", actorRole: "TENANT", action: "UPDATE", entity: "Application", entityId: a.id, summary: `Withdrew an application` });
     toast.success("Application withdrawn");
   };
 

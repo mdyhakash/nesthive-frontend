@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMockQuery } from "@/hooks/use-mock-query";
 import { useLookup } from "@/hooks/use-lookup";
-import { useTenant } from "@/hooks/use-tenant";
+import { useTenantPortal } from "@/hooks/useTenantPortal";
 import { formatDate } from "@/lib/format";
 import { listItemProps } from "@/lib/motion";
 import type { ViewingStatus } from "@/types";
@@ -30,22 +30,23 @@ const TABS: { value: "ALL" | ViewingStatus; label: string }[] = [
 
 export default function TenantViewings() {
   const d = useData();
-  const t = useTenant();
+  const t = useTenantPortal();
   const look = useLookup();
   const { status, retry } = useMockQuery(null);
   const [tab, setTab] = React.useState<"ALL" | ViewingStatus>("ALL");
   const [cancelId, setCancelId] = React.useState<string | null>(null);
 
-  const count = (s: "ALL" | ViewingStatus) => (s === "ALL" ? t.viewings.length : t.viewings.filter((v) => v.status === s).length);
-  const rows = t.viewings
+  const count = (s: "ALL" | ViewingStatus) => (s === "ALL" ? t.viewings.length : t.viewings.filter((v: any) => v.status === s).length);
+  const rows = (t.viewings as any[])
     .filter((v) => tab === "ALL" || v.status === tab)
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .sort((a, b) => ((b.date || b.preferredDate || "") as string).localeCompare((a.date || a.preferredDate || "") as string));
 
   const cancel = () => {
-    const v = t.viewings.find((x) => x.id === cancelId);
+    const v = (t.viewings as any[]).find((x) => x.id === cancelId);
     if (!v) return;
+    t.cancelViewing(v.id);
     d.setViewings((prev) => prev.map((x) => (x.id === v.id ? { ...x, status: "CANCELLED" } : x)));
-    d.audit({ actorId: t.id, actorName: v.tenantName, actorRole: "TENANT", action: "UPDATE", entity: "ViewingRequest", entityId: v.id, summary: `${v.tenantName} cancelled a viewing request` });
+    d.audit({ actorId: t.user?.id || "demo-tenant", actorName: v.tenantName || t.user?.name || "Tenant", actorRole: "TENANT", action: "UPDATE", entity: "ViewingRequest", entityId: v.id, summary: `Cancelled a viewing request` });
     toast.success("Viewing request cancelled");
   };
 

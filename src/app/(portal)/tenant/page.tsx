@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMockQuery } from "@/hooks/use-mock-query";
 import { useLookup } from "@/hooks/use-lookup";
-import { useTenant } from "@/hooks/use-tenant";
+import { useTenantPortal } from "@/hooks/useTenantPortal";
 import { daysUntil, formatBDT, formatDate, MOCK_NOW } from "@/lib/format";
 
 const ACTIONS = [
@@ -38,7 +38,7 @@ function DashboardSkeleton() {
 
 export default function TenantDashboard() {
   const { status, retry } = useMockQuery(null);
-  const t = useTenant();
+  const t = useTenantPortal();
   const look = useLookup();
 
   const lease = t.lease;
