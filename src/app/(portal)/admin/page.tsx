@@ -11,11 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { platformStats, propertiesByStatus, revenueByMonth, usersByRole } from "@/data/analytics";
 import { useMockQuery } from "@/hooks/use-mock-query";
+import { useAdminOverview } from "@/hooks/useAdmin";
 
 export default function AdminOverview() {
   const d = useData();
   const { status, retry } = useMockQuery(null);
-  const pendingKyc = d.owners.filter((o) => o.kycStatus === "PENDING").length;
+  const { data: overviewRes } = useAdminOverview();
+  const live = overviewRes?.data;
+
+  const totalUsers = live?.totalUsers ?? platformStats.totalUsers;
+  const activeProperties = live?.publishedProperties ?? platformStats.activeProperties;
+  const pendingKyc = live?.pendingKycCount ?? d.owners.filter((o) => o.kycStatus === "PENDING").length;
 
   return (
     <>
@@ -31,8 +37,8 @@ export default function AdminOverview() {
       {status === "success" && (
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Total users" value={platformStats.totalUsers} icon={Users} tone="teal" hint="Across all roles" />
-            <StatCard label="Active properties" value={platformStats.activeProperties} icon={Building2} tone="info" hint="Published and bookable" />
+            <StatCard label="Total users" value={totalUsers} icon={Users} tone="teal" hint="Across all roles" />
+            <StatCard label="Active properties" value={activeProperties} icon={Building2} tone="info" hint="Published and bookable" />
             <StatCard label="Monthly revenue" value={platformStats.monthlyRevenue} prefix="৳" icon={Banknote} tone="success" hint="Rent, deposits, utilities" />
             <StatCard label="Pending KYC" value={pendingKyc} icon={ShieldCheck} tone={pendingKyc ? "amber" : "success"} hint={pendingKyc ? "Owners waiting for review" : "Queue is clear"} />
           </div>

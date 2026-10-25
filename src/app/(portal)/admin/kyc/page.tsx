@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMockQuery } from "@/hooks/use-mock-query";
+import { useUpdateKycStatusMutation } from "@/hooks/useAdmin";
 import { formatDate, MOCK_NOW } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { KycStatus, Owner } from "@/types";
@@ -22,6 +23,7 @@ const ADMIN = { id: "u-a1", name: "Tahmina Akter" };
 
 export default function AdminKyc() {
   const d = useData();
+  const updateKycMutation = useUpdateKycStatusMutation();
   const { status, retry } = useMockQuery(null);
   const [tab, setTab] = React.useState<"PENDING" | "ALL">("PENDING");
   const [viewing, setViewing] = React.useState<Owner | null>(null);
@@ -32,6 +34,7 @@ export default function AdminKyc() {
   const pending = d.owners.filter((o) => o.kycStatus === "PENDING").length;
 
   const decide = (o: Owner, next: Exclude<KycStatus, "PENDING">, reason?: string) => {
+    updateKycMutation.mutate({ ownerId: o.id, status: next, rejectReason: reason });
     const now = MOCK_NOW.toISOString();
     d.setOwners((prev) => prev.map((x) => (x.id === o.id ? { ...x, kycStatus: next, kycReviewedAt: now, kycRejectReason: reason } : x)));
     if (next === "APPROVED") d.setProperties((prev) => prev.map((p) => (p.ownerId === o.id ? { ...p, verified: true } : p)));

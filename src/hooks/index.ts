@@ -12,3 +12,4 @@ export * from "./useOwnerPortal";
 export * from "./use-manager";
 export * from "./useMaintenance";
 export * from "./usePayment";
+export * from "./useAdmin";

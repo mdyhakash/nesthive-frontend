@@ -9,3 +9,4 @@ export * from "./lease.api";
 export * from "./maintenance.api";
 export * from "./utility.api";
 export * from "./payment.api";
+export * from "./admin.api";

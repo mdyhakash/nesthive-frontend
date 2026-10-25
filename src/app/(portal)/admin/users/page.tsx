@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMockQuery } from "@/hooks/use-mock-query";
+import { useUpdateUserStatusMutation } from "@/hooks/useAdmin";
 import { formatDate, timeAgo } from "@/lib/format";
 import type { User } from "@/types";
 
@@ -24,6 +25,7 @@ const ROLES = ["TENANT", "OWNER", "MANAGER", "ADMIN"] as const;
 
 export default function AdminUsers() {
   const d = useData();
+  const updateStatusMutation = useUpdateUserStatusMutation();
   const { status, retry } = useMockQuery(null);
   const [q, setQ] = React.useState("");
   const [role, setRole] = React.useState("ALL");
@@ -40,6 +42,7 @@ export default function AdminUsers() {
   const active = (role !== "ALL" ? 1 : 0) + (state !== "ALL" ? 1 : 0);
 
   const setStatus = (u: User, next: "ACTIVE" | "BLOCKED") => {
+    updateStatusMutation.mutate({ userId: u.id, status: next });
     d.setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, status: next } : x)));
     d.audit({ actorId: "u-a1", actorName: "Tahmina Akter", actorRole: "ADMIN", action: next === "BLOCKED" ? "BLOCK" : "UNBLOCK", entity: "User", entityId: u.id, summary: `${next === "BLOCKED" ? "Blocked" : "Unblocked"} ${u.name}` });
     toast.success(next === "BLOCKED" ? `${u.name} blocked` : `${u.name} unblocked`);
