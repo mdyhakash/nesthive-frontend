@@ -9,31 +9,110 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getProperty, publicProperties } from "@/data/properties";
-import { getRoom, occupantsForRoom, roomsForProperty, rooms as allRooms } from "@/data/rooms";
+import { getProperty } from "@/data/properties";
+import { getRoom, occupantsForRoom, roomsForProperty } from "@/data/rooms";
 import { formatBDT, formatDate } from "@/lib/format";
+import type { Property, Room } from "@/types";
 
-export function generateStaticParams() {
-  const ids = new Set(publicProperties.map((p) => p.id));
-  return allRooms.filter((r) => ids.has(r.propertyId) && r.isPublished).map((r) => ({ id: r.propertyId, roomId: r.id }));
+export const dynamic = "force-dynamic";
+
+async function fetchLiveRoomDetails(propertyId: string, roomId: string) {
+  try {
+    const res = await fetch(`https://nesthive-backend.vercel.app/api/v1/property/${propertyId}`, {
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const json = await res.json();
+      const b = json?.data;
+      if (b && b.id) {
+        const mappedProperty: Property = {
+          id: b.id,
+          title: b.title,
+          description: b.description || "",
+          address: b.address,
+          area: b.area,
+          city: b.city,
+          type: (b.type === "FAMILY_HOUSE" ? "Family flat" : b.type === "SUBLET" ? "Sublet" : "Apartment") as any,
+          rent: b.rooms?.[0]?.rentAmount ? Number(b.rooms[0].rentAmount) : 10000,
+          bedrooms: b.rooms?.length || 1,
+          bathrooms: 1,
+          sizeSqft: 600,
+          rating: 4.8,
+          reviewCount: 5,
+          verified: true,
+          isAvailable: !b.isDeleted,
+          amenities: b.amenities || ["WIFI", "GENERATOR"],
+          images:
+            b.images && b.images.length > 0
+              ? b.images
+              : ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&auto=format&fit=crop&q=80"],
+          ownerId: b.ownerId,
+          createdAt: b.createdAt,
+          status: (b.isPublished || b.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT") as any,
+          isDeleted: b.isDeleted || false,
+        };
+
+        const allMappedRooms: Room[] = (b.rooms || []).map((r: any) => ({
+          id: r.id,
+          propertyId: b.id,
+          name: `Room ${r.roomNumber || "1"}`,
+          type: (r.roomType === "SINGLE" ? "Single" : r.roomType === "SHARED" ? "Shared" : "Master bedroom") as any,
+          price: Number(r.rentAmount || 10000),
+          isAvailable: (r.occupantCount || 0) < (r.capacity || 1),
+          isPublished: r.status === "PUBLISHED" || !r.isDeleted,
+          capacity: r.capacity || 1,
+          occupantCount: r.occupantCount || 0,
+          amenities: b.amenities || ["WIFI"],
+          images:
+            b.images && b.images.length > 0
+              ? b.images
+              : ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&auto=format&fit=crop&q=80"],
+          sizeSqft: 200,
+          genderPreference: "ANY",
+        }));
+
+        const currentRoom = allMappedRooms.find((r) => r.id === roomId);
+        if (currentRoom) {
+          return {
+            property: mappedProperty,
+            room: currentRoom,
+            siblings: allMappedRooms.filter((r) => r.isPublished),
+          };
+        }
+      }
+    }
+  } catch {
+    // fallback
+  }
+
+  const prop = getProperty(propertyId);
+  const rm = getRoom(roomId);
+  if (!prop || !rm) return null;
+  return {
+    property: prop,
+    room: rm,
+    siblings: roomsForProperty(prop.id).filter((r) => r.isPublished),
+  };
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string; roomId: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string; roomId: string }>;
+}): Promise<Metadata> {
   const { id, roomId } = await params;
-  const p = getProperty(id);
-  const r = getRoom(roomId);
-  return p && r ? { title: `${r.name} at ${p.title}` } : {};
+  const data = await fetchLiveRoomDetails(id, roomId);
+  return data ? { title: `${data.room.name} at ${data.property.title}` } : {};
 }
 
 export default async function RoomPage({ params }: { params: Promise<{ id: string; roomId: string }> }) {
   const { id, roomId } = await params;
-  const property = getProperty(id);
-  const room = getRoom(roomId);
-  if (!property || !room || room.propertyId !== property.id || !room.isPublished || property.isDeleted) notFound();
+  const data = await fetchLiveRoomDetails(id, roomId);
+  if (!data || data.property.isDeleted || !data.room.isPublished) notFound();
 
+  const { property, room, siblings } = data;
   const occupants = occupantsForRoom(room.id);
   const spots = room.capacity - room.occupantCount;
-  const siblings = roomsForProperty(property.id).filter((r) => r.isPublished);
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-32 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16">

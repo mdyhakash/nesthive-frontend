@@ -1,10 +1,10 @@
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
 import { useProperties } from "./useProperties";
-import { publicProperties } from "@/data/properties";
 import type { Property } from "@/types";
-import { roomsForProperty } from "@/data/rooms";
 import { defaultFilters, RENT_MAX, type BrowseFilterState, countActive } from "@/components/marketing/browse-filters";
+import { extractData } from "@/lib/api-helper";
+import type { PropertyItem } from "@/api/property.api";
 
 const PAGE_SIZE = 6;
 
@@ -33,55 +33,59 @@ export function useBrowse() {
 
   const results = React.useMemo(() => {
     const q = query.trim().toLowerCase();
-    
-    // Check if backend returned any properties
-    const backendItems = apiData?.data;
-    let baseList: Property[] = publicProperties;
+    const rawItems = extractData<PropertyItem[]>(apiData);
+    const backendItems = Array.isArray(rawItems) ? rawItems : [];
 
-    if (Array.isArray(backendItems) && backendItems.length > 0) {
-      // Map backend property items to compatible property shape
-      const mappedBackend: Property[] = backendItems.map((b) => ({
+    // Map live backend properties
+    const mappedProperties: (Property & { rawRooms?: any[] })[] = backendItems.map((b) => {
+      const firstRoomRent = b.rooms?.[0]?.rentAmount ? Number(b.rooms[0].rentAmount) : 10000;
+      return {
         id: b.id,
         title: b.title,
         description: b.description || "",
         address: b.address,
         area: b.area,
         city: b.city,
-        type: "Apartment",
-        rent: b.rooms?.[0]?.rentAmount || 10000,
-        bedrooms: b.rooms?.length || 2,
+        type: (b.type === "FAMILY_HOUSE" ? "Family flat" : b.type === "SUBLET" ? "Sublet" : "Apartment") as any,
+        rent: firstRoomRent,
+        bedrooms: b.rooms?.length || 1,
         bathrooms: 1,
         sizeSqft: 600,
         rating: 4.8,
-        reviewCount: 12,
+        reviewCount: 5,
         verified: true,
-        isAvailable: true,
+        isAvailable: !b.isDeleted,
         amenities: (b.amenities as any) || ["WIFI", "GENERATOR"],
-        images: b.images && b.images.length > 0 ? b.images : [
-          "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&auto=format&fit=crop&q=80",
-        ],
+        images:
+          b.images && b.images.length > 0
+            ? b.images
+            : ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&auto=format&fit=crop&q=80"],
         ownerId: b.ownerId,
         createdAt: b.createdAt,
-        status: "PUBLISHED",
-        isDeleted: false,
-      }));
+        status: (b.isPublished || (b as any).status === "PUBLISHED" ? "PUBLISHED" : "DRAFT") as any,
+        isDeleted: b.isDeleted || false,
+        rawRooms: b.rooms || [],
+      };
+    });
 
-      // Combine backend items with existing public mock listings (avoid duplicate IDs)
-      const existingIds = new Set(mappedBackend.map((m) => m.id));
-      baseList = [...mappedBackend, ...publicProperties.filter((p) => !existingIds.has(p.id))];
-    }
-
-    const list = baseList.filter((p) => {
+    const list = mappedProperties.filter((p) => {
+      if (p.isDeleted || p.status !== "PUBLISHED") return false;
       if (q && !`${p.title} ${p.area} ${p.address}`.toLowerCase().includes(q)) return false;
-      if (filters.area !== "any" && p.area !== filters.area) return false;
+      if (filters.area !== "any" && p.area.toLowerCase() !== filters.area.toLowerCase()) return false;
       if (
         filters.roomType !== "any" &&
-        !roomsForProperty(p.id).some((r) => r.type === filters.roomType && r.isPublished)
+        p.rawRooms &&
+        !p.rawRooms.some((r: any) => (r.roomType || "").toLowerCase() === filters.roomType.toLowerCase())
       ) {
         return false;
       }
       if (p.rent > filters.maxRent) return false;
-      if (!filters.amenities.every((a) => p.amenities.includes(a))) return false;
+      if (
+        filters.amenities.length > 0 &&
+        !filters.amenities.every((a) => p.amenities.some((m) => m.toLowerCase().includes(a.toLowerCase())))
+      ) {
+        return false;
+      }
       return true;
     });
 

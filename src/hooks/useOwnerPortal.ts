@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { propertyApi } from "@/api/property.api";
-import { roomApi } from "@/api/room.api";
 import { applicationApi } from "@/api/application.api";
 import { viewingApi } from "@/api/viewing.api";
-import { leaseApi } from "@/api/lease.api";
+import { leaseApi, type LeaseItem } from "@/api/lease.api";
 import { useAuthStore } from "@/store/auth.store";
 import { useOwner } from "./use-owner";
 import { useMyProperties, useCreatePropertyMutation, useUpdatePropertyMutation, usePublishPropertyMutation, useDeletePropertyMutation } from "./useProperties";
+import { extractData } from "@/lib/api-helper";
+import type { PropertyItem } from "@/api/property.api";
 import { toast } from "sonner";
 
 export const OWNER_PORTAL_KEYS = {
@@ -65,8 +65,10 @@ export function useOwnerPortal() {
   });
 
   // Live data mappings
-  const liveProperties = propertiesQuery.data?.data;
-  const properties = (liveProperties && liveProperties.length > 0)
+  const rawProps = extractData<PropertyItem[]>(propertiesQuery.data);
+  const liveProperties = Array.isArray(rawProps) ? rawProps : null;
+
+  const properties = liveProperties !== null
     ? liveProperties.map((p) => ({
         id: p.id,
         ownerId: p.ownerId,
@@ -77,13 +79,13 @@ export function useOwnerPortal() {
         city: p.city,
         area: p.area,
         address: p.address,
-        rent: p.rooms?.[0]?.rentAmount || 15000,
-        status: (p.isPublished ? "PUBLISHED" : "DRAFT") as any,
+        rent: p.rooms?.[0]?.rentAmount ? Number(p.rooms[0].rentAmount) : 15000,
+        status: (p.isPublished || (p as any).status === "PUBLISHED" ? "PUBLISHED" : "DRAFT") as any,
         isAvailable: true,
         isDeleted: false,
         images: p.images || [],
         amenities: p.amenities || [],
-        bedrooms: p.rooms?.length || 2,
+        bedrooms: p.rooms?.length || 1,
         bathrooms: 1,
         sizeSqft: 650,
         rating: 4.8,
@@ -93,8 +95,9 @@ export function useOwnerPortal() {
       }))
     : fallback.properties;
 
-  const liveLeases = leasesQuery.data?.data;
-  const leases = (liveLeases && liveLeases.length > 0) ? liveLeases : fallback.leases;
+  const rawLeases = extractData<LeaseItem[]>(leasesQuery.data);
+  const liveLeases = Array.isArray(rawLeases) ? rawLeases : null;
+  const leases = liveLeases !== null ? liveLeases : fallback.leases;
 
   return {
     id: fallback.id,

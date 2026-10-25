@@ -38,32 +38,32 @@ export interface ViewingRequestItem {
 
 export const viewingApi = {
   createViewingRequest: async (roomId: string, data: CreateViewingRequestPayload): Promise<ApiResponse<ViewingRequestItem>> => {
-    const res = await apiClient.post<ApiResponse<ViewingRequestItem>>(`/viewing-request/room/${roomId}`, data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<ViewingRequestItem>>(`/viewing-request/room/${roomId}`, data);
+    return res;
   },
 
   getMyViewingRequests: async (): Promise<ApiResponse<ViewingRequestItem[]>> => {
-    const res = await apiClient.get<ApiResponse<ViewingRequestItem[]>>("/viewing-request/my-requests");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<ViewingRequestItem[]>>("/viewing-request/my-requests");
+    return res;
   },
 
   getViewingRequestsForRoom: async (roomId: string): Promise<ApiResponse<ViewingRequestItem[]>> => {
-    const res = await apiClient.get<ApiResponse<ViewingRequestItem[]>>(`/viewing-request/room/${roomId}`);
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<ViewingRequestItem[]>>(`/viewing-request/room/${roomId}`);
+    return res;
   },
 
   getViewingRequestById: async (id: string): Promise<ApiResponse<ViewingRequestItem>> => {
-    const res = await apiClient.get<ApiResponse<ViewingRequestItem>>(`/viewing-request/${id}`);
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<ViewingRequestItem>>(`/viewing-request/${id}`);
+    return res;
   },
 
   updateViewingRequestStatus: async (id: string, status: "CONFIRMED" | "DECLINED" | "COMPLETED"): Promise<ApiResponse<ViewingRequestItem>> => {
-    const res = await apiClient.patch<ApiResponse<ViewingRequestItem>>(`/viewing-request/${id}/status`, { status });
-    return res.data;
+    const res = await apiClient.patch<unknown, ApiResponse<ViewingRequestItem>>(`/viewing-request/${id}/status`, { status });
+    return res;
   },
 
   cancelViewingRequest: async (id: string): Promise<ApiResponse<ViewingRequestItem>> => {
-    const res = await apiClient.patch<ApiResponse<ViewingRequestItem>>(`/viewing-request/${id}/cancel`);
-    return res.data;
+    const res = await apiClient.patch<unknown, ApiResponse<ViewingRequestItem>>(`/viewing-request/${id}/cancel`);
+    return res;
   },
 };

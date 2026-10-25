@@ -42,35 +42,35 @@ export interface MaintenanceItem {
 
 export const maintenanceApi = {
   createRequest: async (data: CreateMaintenancePayload): Promise<ApiResponse<MaintenanceItem>> => {
-    const res = await apiClient.post<ApiResponse<MaintenanceItem>>("/maintenance", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<MaintenanceItem>>("/maintenance", data);
+    return res;
   },
 
   getMyRequests: async (): Promise<ApiResponse<MaintenanceItem[]>> => {
-    const res = await apiClient.get<ApiResponse<MaintenanceItem[]>>("/maintenance/my-requests");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<MaintenanceItem[]>>("/maintenance/my-requests");
+    return res;
   },
 
   getOwnerRequests: async (): Promise<ApiResponse<MaintenanceItem[]>> => {
-    const res = await apiClient.get<ApiResponse<MaintenanceItem[]>>("/maintenance/owner-requests");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<MaintenanceItem[]>>("/maintenance/owner-requests");
+    return res;
   },
 
   getAllRequests: async (): Promise<ApiResponse<MaintenanceItem[]>> => {
-    const res = await apiClient.get<ApiResponse<MaintenanceItem[]>>("/maintenance");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<MaintenanceItem[]>>("/maintenance");
+    return res;
   },
 
   getById: async (id: string): Promise<ApiResponse<MaintenanceItem>> => {
-    const res = await apiClient.get<ApiResponse<MaintenanceItem>>(`/maintenance/${id}`);
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<MaintenanceItem>>(`/maintenance/${id}`);
+    return res;
   },
 
   updateStatus: async (
     id: string,
     status: "PENDING" | "IN_PROGRESS" | "RESOLVED" | "CANCELLED",
   ): Promise<ApiResponse<MaintenanceItem>> => {
-    const res = await apiClient.patch<ApiResponse<MaintenanceItem>>(`/maintenance/${id}/status`, { status });
-    return res.data;
+    const res = await apiClient.patch<unknown, ApiResponse<MaintenanceItem>>(`/maintenance/${id}/status`, { status });
+    return res;
   },
 };

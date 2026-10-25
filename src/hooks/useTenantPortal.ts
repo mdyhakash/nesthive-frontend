@@ -4,6 +4,7 @@ import { viewingApi, type ViewingRequestItem } from "@/api/viewing.api";
 import { applicationApi, type ApplicationItem } from "@/api/application.api";
 import { useAuthStore } from "@/store/auth.store";
 import { useTenant } from "./use-tenant";
+import { extractData } from "@/lib/api-helper";
 import { toast } from "sonner";
 
 export const TENANT_PORTAL_KEYS = {
@@ -79,13 +80,15 @@ export function useTenantPortal() {
   });
 
   // Merged active and past leases
-  const liveLeases = leasesQuery.data?.data;
-  const activeLease = liveLeases?.find((l) => l.status === "ACTIVE") || fallback.lease;
-  const pastLeases = liveLeases?.filter((l) => l.status === "TERMINATED") || fallback.pastLeases;
+  const rawLeases = extractData<LeaseItem[]>(leasesQuery.data);
+  const liveLeases = Array.isArray(rawLeases) ? rawLeases : null;
+  const activeLease = liveLeases?.find((l) => l.status === "ACTIVE") || (liveLeases ? null : fallback.lease);
+  const pastLeases = liveLeases?.filter((l) => l.status === "TERMINATED") || (liveLeases ? [] : fallback.pastLeases);
 
   // Merged viewing requests with normalized UI fields
-  const liveViewings = viewingsQuery.data?.data;
-  const viewings = (liveViewings && liveViewings.length > 0)
+  const rawViewings = extractData<ViewingRequestItem[]>(viewingsQuery.data);
+  const liveViewings = Array.isArray(rawViewings) ? rawViewings : null;
+  const viewings = liveViewings !== null
     ? liveViewings.map((v) => ({
         id: v.id,
         roomId: v.roomId,
@@ -101,8 +104,9 @@ export function useTenantPortal() {
     : fallback.viewings;
 
   // Merged applications with normalized UI fields
-  const liveApplications = applicationsQuery.data?.data;
-  const applications = (liveApplications && liveApplications.length > 0)
+  const rawApps = extractData<ApplicationItem[]>(applicationsQuery.data);
+  const liveApplications = Array.isArray(rawApps) ? rawApps : null;
+  const applications = liveApplications !== null
     ? liveApplications.map((a) => ({
         id: a.id,
         roomId: a.roomId,

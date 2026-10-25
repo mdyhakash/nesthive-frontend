@@ -36,6 +36,8 @@ export interface PropertyItem {
   amenities?: string[];
   images?: string[];
   isPublished?: boolean;
+  status?: string;
+  isDeleted?: boolean;
   ownerId: string;
   managerId?: string | null;
   rooms?: any[];
@@ -56,47 +58,47 @@ export interface PropertyItem {
 
 export const propertyApi = {
   getAllProperties: async (params?: PropertyFilterParams): Promise<ApiResponse<PropertyItem[]>> => {
-    const res = await apiClient.get<ApiResponse<PropertyItem[]>>("/property", { params });
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<PropertyItem[]>>("/property", { params });
+    return res;
   },
 
   getPropertyById: async (id: string): Promise<ApiResponse<PropertyItem>> => {
-    const res = await apiClient.get<ApiResponse<PropertyItem>>(`/property/${id}`);
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<PropertyItem>>(`/property/${id}`);
+    return res;
   },
 
   getMyProperties: async (params?: PropertyFilterParams): Promise<ApiResponse<PropertyItem[]>> => {
-    const res = await apiClient.get<ApiResponse<PropertyItem[]>>("/property/my-properties", { params });
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<PropertyItem[]>>("/property/my-properties", { params });
+    return res;
   },
 
   getAssignedPropertiesForManager: async (): Promise<ApiResponse<PropertyItem[]>> => {
-    const res = await apiClient.get<ApiResponse<PropertyItem[]>>("/property/assigned/my-properties");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<PropertyItem[]>>("/property/assigned/my-properties");
+    return res;
   },
 
   createProperty: async (data: CreatePropertyPayload): Promise<ApiResponse<PropertyItem>> => {
-    const res = await apiClient.post<ApiResponse<PropertyItem>>("/property/create-property", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<PropertyItem>>("/property/create-property", data);
+    return res;
   },
 
   updateProperty: async (id: string, data: Partial<CreatePropertyPayload>): Promise<ApiResponse<PropertyItem>> => {
-    const res = await apiClient.patch<ApiResponse<PropertyItem>>(`/property/${id}`, data);
-    return res.data;
+    const res = await apiClient.patch<unknown, ApiResponse<PropertyItem>>(`/property/${id}`, data);
+    return res;
   },
 
   publishProperty: async (id: string): Promise<ApiResponse<PropertyItem>> => {
-    const res = await apiClient.patch<ApiResponse<PropertyItem>>(`/property/${id}/publish`);
-    return res.data;
+    const res = await apiClient.patch<unknown, ApiResponse<PropertyItem>>(`/property/${id}/publish`);
+    return res;
   },
 
   assignManager: async (id: string, managerId: string): Promise<ApiResponse<PropertyItem>> => {
-    const res = await apiClient.patch<ApiResponse<PropertyItem>>(`/property/${id}/assign-manager`, { managerId });
-    return res.data;
+    const res = await apiClient.patch<unknown, ApiResponse<PropertyItem>>(`/property/${id}/assign-manager`, { managerId });
+    return res;
   },
 
   deleteProperty: async (id: string): Promise<ApiResponse<{ id: string }>> => {
-    const res = await apiClient.delete<ApiResponse<{ id: string }>>(`/property/${id}`);
-    return res.data;
+    const res = await apiClient.delete<unknown, ApiResponse<{ id: string }>>(`/property/${id}`);
+    return res;
   },
 };

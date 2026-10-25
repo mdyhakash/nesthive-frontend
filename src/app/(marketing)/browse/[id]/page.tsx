@@ -7,27 +7,108 @@ import { ImageGallery } from "@/components/shared/image-gallery";
 import { RoomCard } from "@/components/shared/room-card";
 import { Badge } from "@/components/ui/badge";
 import { owners } from "@/data/users";
-import { getProperty, publicProperties } from "@/data/properties";
+import { getProperty } from "@/data/properties";
 import { roomsForProperty } from "@/data/rooms";
 import { formatBDT } from "@/lib/format";
+import type { Owner, Property, Room } from "@/types";
 
-export function generateStaticParams() {
-  return publicProperties.map((p) => ({ id: p.id }));
+export const dynamic = "force-dynamic";
+
+async function getPropertyDetails(id: string) {
+  try {
+    const res = await fetch(`https://nesthive-backend.vercel.app/api/v1/property/${id}`, {
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const json = await res.json();
+      const b = json?.data;
+      if (b && b.id) {
+        const mappedProperty: Property = {
+          id: b.id,
+          title: b.title,
+          description: b.description || "",
+          address: b.address,
+          area: b.area,
+          city: b.city,
+          type: (b.type === "FAMILY_HOUSE" ? "Family flat" : b.type === "SUBLET" ? "Sublet" : "Apartment") as any,
+          rent: b.rooms?.[0]?.rentAmount ? Number(b.rooms[0].rentAmount) : 10000,
+          bedrooms: b.rooms?.length || 1,
+          bathrooms: 1,
+          sizeSqft: 600,
+          rating: 4.8,
+          reviewCount: 5,
+          verified: true,
+          isAvailable: !b.isDeleted,
+          amenities: b.amenities || ["WIFI", "GENERATOR"],
+          images:
+            b.images && b.images.length > 0
+              ? b.images
+              : ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&auto=format&fit=crop&q=80"],
+          ownerId: b.ownerId,
+          createdAt: b.createdAt,
+          status: (b.isPublished || b.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT") as any,
+          isDeleted: b.isDeleted || false,
+        };
+
+        const mappedRooms: Room[] = (b.rooms || []).map((r: any) => ({
+          id: r.id,
+          propertyId: b.id,
+          name: `Room ${r.roomNumber || "1"}`,
+          type: (r.roomType === "SINGLE" ? "Single" : r.roomType === "SHARED" ? "Shared" : "Master bedroom") as any,
+          price: Number(r.rentAmount || 10000),
+          isAvailable: (r.occupantCount || 0) < (r.capacity || 1),
+          isPublished: r.status === "PUBLISHED" || !r.isDeleted,
+          capacity: r.capacity || 1,
+          occupantCount: r.occupantCount || 0,
+          amenities: b.amenities || ["WIFI"],
+          images:
+            b.images && b.images.length > 0
+              ? b.images
+              : ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&auto=format&fit=crop&q=80"],
+          sizeSqft: 200,
+          genderPreference: "ANY",
+        }));
+
+        const mappedOwner: Owner = {
+          id: b.ownerId,
+          userId: b.ownerId,
+          name: b.owner?.name || "Property Owner",
+          email: b.owner?.email || "owner@nesthive.com",
+          phone: b.owner?.phone || "N/A",
+          kycStatus: "APPROVED",
+          documents: [],
+          propertyCount: 1,
+        };
+
+        return { property: mappedProperty, rooms: mappedRooms, owner: mappedOwner };
+      }
+    }
+  } catch {
+    // fallback
+  }
+
+  const prop = getProperty(id);
+  if (!prop) return null;
+  return {
+    property: prop,
+    rooms: roomsForProperty(prop.id).filter((r) => r.isPublished),
+    owner: owners.find((o) => o.id === prop.ownerId),
+  };
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const p = getProperty(id);
+  const data = await getPropertyDetails(id);
+  const p = data?.property;
   return p ? { title: `${p.title}, ${p.area}`, description: p.description.slice(0, 150) } : {};
 }
 
 export default async function PropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const property = getProperty(id);
-  if (!property || property.isDeleted || property.status !== "PUBLISHED") notFound();
+  const data = await getPropertyDetails(id);
+  if (!data || !data.property || data.property.isDeleted || data.property.status !== "PUBLISHED") notFound();
 
-  const rooms = roomsForProperty(property.id).filter((r) => r.isPublished);
-  const owner = owners.find((o) => o.id === property.ownerId);
+  const { property, rooms, owner } = data;
   const cheapest = rooms.length ? Math.min(...rooms.map((r) => r.price)) : property.rent;
 
   return (
@@ -98,7 +179,10 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             </h2>
             <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {property.amenities.map((a) => (
-                <li key={a} className="flex min-h-11 items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 text-sm">
+                <li
+                  key={a}
+                  className="flex min-h-11 items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 text-sm"
+                >
                   <span aria-hidden="true" className="size-2 rounded-full bg-secondary" />
                   {a}
                 </li>

@@ -46,32 +46,32 @@ export interface ApplicationItem {
 
 export const applicationApi = {
   createApplication: async (data: CreateApplicationPayload): Promise<ApiResponse<ApplicationItem>> => {
-    const res = await apiClient.post<ApiResponse<ApplicationItem>>("/application", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<ApplicationItem>>("/application", data);
+    return res;
   },
 
   getMyApplications: async (): Promise<ApiResponse<ApplicationItem[]>> => {
-    const res = await apiClient.get<ApiResponse<ApplicationItem[]>>("/application/my-applications");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<ApplicationItem[]>>("/application/my-applications");
+    return res;
   },
 
   getApplicationsForRoom: async (roomId: string): Promise<ApiResponse<ApplicationItem[]>> => {
-    const res = await apiClient.get<ApiResponse<ApplicationItem[]>>(`/application/room/${roomId}`);
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<ApplicationItem[]>>(`/application/room/${roomId}`);
+    return res;
   },
 
   getApplicationById: async (id: string): Promise<ApiResponse<ApplicationItem>> => {
-    const res = await apiClient.get<ApiResponse<ApplicationItem>>(`/application/${id}`);
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<ApplicationItem>>(`/application/${id}`);
+    return res;
   },
 
   updateApplicationStatus: async (id: string, status: "APPROVED" | "REJECTED"): Promise<ApiResponse<ApplicationItem>> => {
-    const res = await apiClient.patch<ApiResponse<ApplicationItem>>(`/application/${id}/status`, { status });
-    return res.data;
+    const res = await apiClient.patch<unknown, ApiResponse<ApplicationItem>>(`/application/${id}/status`, { status });
+    return res;
   },
 
   withdrawApplication: async (id: string): Promise<ApiResponse<ApplicationItem>> => {
-    const res = await apiClient.patch<ApiResponse<ApplicationItem>>(`/application/${id}/withdraw`);
-    return res.data;
+    const res = await apiClient.patch<unknown, ApiResponse<ApplicationItem>>(`/application/${id}/withdraw`);
+    return res;
   },
 };

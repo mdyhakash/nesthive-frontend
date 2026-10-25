@@ -34,27 +34,27 @@ export interface LeaseItem {
 
 export const leaseApi = {
   getMyLeasesAsTenant: async (): Promise<ApiResponse<LeaseItem[]>> => {
-    const res = await apiClient.get<ApiResponse<LeaseItem[]>>("/lease/my-leases");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<LeaseItem[]>>("/lease/my-leases");
+    return res;
   },
 
   getMyLeasesAsOwner: async (): Promise<ApiResponse<LeaseItem[]>> => {
-    const res = await apiClient.get<ApiResponse<LeaseItem[]>>("/lease/owner-leases");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<LeaseItem[]>>("/lease/owner-leases");
+    return res;
   },
 
   getLeaseById: async (id: string): Promise<ApiResponse<LeaseItem>> => {
-    const res = await apiClient.get<ApiResponse<LeaseItem>>(`/lease/${id}`);
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<LeaseItem>>(`/lease/${id}`);
+    return res;
   },
 
   terminateLease: async (id: string, reason?: string): Promise<ApiResponse<LeaseItem>> => {
-    const res = await apiClient.patch<ApiResponse<LeaseItem>>(`/lease/${id}/terminate`, { reason });
-    return res.data;
+    const res = await apiClient.patch<unknown, ApiResponse<LeaseItem>>(`/lease/${id}/terminate`, { reason });
+    return res;
   },
 
   getAllLeases: async (): Promise<ApiResponse<LeaseItem[]>> => {
-    const res = await apiClient.get<ApiResponse<LeaseItem[]>>("/lease");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<LeaseItem[]>>("/lease");
+    return res;
   },
 };

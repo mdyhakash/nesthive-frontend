@@ -30,52 +30,52 @@ export interface PaymentItem {
 
 export const paymentApi = {
   initiateDeposit: async (data: InitiatePaymentPayload): Promise<ApiResponse<PaymentItem>> => {
-    const res = await apiClient.post<ApiResponse<PaymentItem>>("/payment/initiate-deposit", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<PaymentItem>>("/payment/initiate-deposit", data);
+    return res;
   },
 
   confirmDeposit: async (data: ConfirmPaymentPayload): Promise<ApiResponse<PaymentItem>> => {
-    const res = await apiClient.post<ApiResponse<PaymentItem>>("/payment/confirm-deposit", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<PaymentItem>>("/payment/confirm-deposit", data);
+    return res;
   },
 
   initiateRent: async (data: InitiatePaymentPayload): Promise<ApiResponse<PaymentItem>> => {
-    const res = await apiClient.post<ApiResponse<PaymentItem>>("/payment/initiate-rent", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<PaymentItem>>("/payment/initiate-rent", data);
+    return res;
   },
 
   confirmRent: async (data: ConfirmPaymentPayload): Promise<ApiResponse<PaymentItem>> => {
-    const res = await apiClient.post<ApiResponse<PaymentItem>>("/payment/confirm-rent", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<PaymentItem>>("/payment/confirm-rent", data);
+    return res;
   },
 
   initiateUtility: async (data: InitiatePaymentPayload): Promise<ApiResponse<PaymentItem>> => {
-    const res = await apiClient.post<ApiResponse<PaymentItem>>("/payment/initiate-utility", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<PaymentItem>>("/payment/initiate-utility", data);
+    return res;
   },
 
   confirmUtility: async (data: ConfirmPaymentPayload): Promise<ApiResponse<PaymentItem>> => {
-    const res = await apiClient.post<ApiResponse<PaymentItem>>("/payment/confirm-utility", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<PaymentItem>>("/payment/confirm-utility", data);
+    return res;
   },
 
   executeBkash: async (data: { paymentId: string; amount: number; callbackUrl?: string }): Promise<ApiResponse<any>> => {
-    const res = await apiClient.post<ApiResponse<any>>("/payment/bkash/execute", data);
-    return res.data;
+    const res = await apiClient.post<unknown, ApiResponse<any>>("/payment/bkash/execute", data);
+    return res;
   },
 
   getMyPayments: async (): Promise<ApiResponse<PaymentItem[]>> => {
-    const res = await apiClient.get<ApiResponse<PaymentItem[]>>("/payment/my-payments");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<PaymentItem[]>>("/payment/my-payments");
+    return res;
   },
 
   getOwnerPayments: async (): Promise<ApiResponse<PaymentItem[]>> => {
-    const res = await apiClient.get<ApiResponse<PaymentItem[]>>("/payment/owner-payments");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<PaymentItem[]>>("/payment/owner-payments");
+    return res;
   },
 
   getAllPayments: async (): Promise<ApiResponse<PaymentItem[]>> => {
-    const res = await apiClient.get<ApiResponse<PaymentItem[]>>("/payment");
-    return res.data;
+    const res = await apiClient.get<unknown, ApiResponse<PaymentItem[]>>("/payment");
+    return res;
   },
 };
