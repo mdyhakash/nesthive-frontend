@@ -2,6 +2,7 @@ export * from "./useAuthMutations";
 export * from "./useUserProfile";
 export * from "./useProperties";
 export * from "./useRooms";
+export * from "./useBrowse";
 export * from "./use-mock-query";
 export * from "./use-lookup";
 export * from "./use-tenant";
