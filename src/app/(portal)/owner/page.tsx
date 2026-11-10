@@ -37,7 +37,7 @@ export default function OwnerDashboard() {
   return (
     <>
       <PageHeader
-        title={`Welcome back, ${o.owner.name.split(" ")[0]}`}
+        title={`Welcome back, ${o.owner.name ? o.owner.name.split(" ")[0] : "Owner"}`}
         description="A quick look at your properties, rooms and income."
         action={
           <Button asChild>

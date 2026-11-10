@@ -10,7 +10,16 @@ export function useOwner() {
   const id = CURRENT_OWNER_ID;
 
   return React.useMemo(() => {
-    const owner = d.owners.find((o) => o.id === id)!;
+    const owner = d.owners.find((o) => o.id === id) || {
+      id: "",
+      userId: "",
+      name: "Owner",
+      email: "",
+      phone: "",
+      kycStatus: "PENDING" as const,
+      documents: [],
+      propertyCount: 0,
+    };
     const allProperties = d.properties.filter((p) => p.ownerId === id);
     const properties = allProperties.filter((p) => !p.isDeleted);
     const ids = new Set(allProperties.map((p) => p.id));

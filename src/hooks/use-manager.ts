@@ -10,7 +10,17 @@ export function useManager() {
   const id = CURRENT_MANAGER_ID;
 
   return React.useMemo(() => {
-    const manager = d.managers.find((m) => m.id === id)!;
+    const manager = d.managers.find((m) => m.id === id) || {
+      id: "",
+      userId: "",
+      ownerId: "",
+      name: "Manager",
+      email: "",
+      phone: "",
+      status: "ACTIVE" as const,
+      assignedPropertyIds: [],
+      joinedAt: "",
+    };
     const properties = d.properties.filter((p) => !p.isDeleted && (p.managerId === id || manager.assignedPropertyIds.includes(p.id)));
     const ids = new Set(properties.map((p) => p.id));
     const rooms = d.rooms.filter((r) => ids.has(r.propertyId));

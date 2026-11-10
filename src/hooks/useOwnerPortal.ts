@@ -3,7 +3,6 @@ import { applicationApi } from "@/api/application.api";
 import { viewingApi } from "@/api/viewing.api";
 import { leaseApi, type LeaseItem } from "@/api/lease.api";
 import { useAuthStore } from "@/store/auth.store";
-import { useOwner } from "./use-owner";
 import { useMyProperties, useCreatePropertyMutation, useUpdatePropertyMutation, usePublishPropertyMutation, useDeletePropertyMutation } from "./useProperties";
 import { extractData } from "@/lib/api-helper";
 import type { PropertyItem } from "@/api/property.api";
@@ -18,7 +17,6 @@ export const OWNER_PORTAL_KEYS = {
 
 export function useOwnerPortal() {
   const { user, isAuthenticated } = useAuthStore();
-  const fallback = useOwner();
   const queryClient = useQueryClient();
 
   const isOwner = isAuthenticated && (user?.role === "OWNER" || !user?.role);
@@ -66,54 +64,61 @@ export function useOwnerPortal() {
 
   // Live data mappings
   const rawProps = extractData<PropertyItem[]>(propertiesQuery.data);
-  const liveProperties = Array.isArray(rawProps) ? rawProps : null;
+  const liveProperties = Array.isArray(rawProps) ? rawProps : [];
 
-  const properties = liveProperties !== null
-    ? liveProperties.map((p) => ({
-        id: p.id,
-        ownerId: p.ownerId,
-        managerId: p.managerId || undefined,
-        title: p.title,
-        description: p.description || "",
-        type: "Apartment" as const,
-        city: p.city,
-        area: p.area,
-        address: p.address,
-        rent: p.rooms?.[0]?.rentAmount ? Number(p.rooms[0].rentAmount) : 15000,
-        status: (p.isPublished || (p as any).status === "PUBLISHED" ? "PUBLISHED" : "DRAFT") as any,
-        isAvailable: true,
-        isDeleted: false,
-        images: p.images || [],
-        amenities: p.amenities || [],
-        bedrooms: p.rooms?.length || 1,
-        bathrooms: 1,
-        sizeSqft: 650,
-        rating: 4.8,
-        reviewCount: 5,
-        verified: true,
-        createdAt: p.createdAt,
-      }))
-    : fallback.properties;
+  const properties = liveProperties.map((p) => ({
+    id: p.id,
+    ownerId: p.ownerId,
+    managerId: p.managerId || undefined,
+    title: p.title,
+    description: p.description || "",
+    type: "Apartment" as const,
+    city: p.city,
+    area: p.area,
+    address: p.address,
+    rent: p.rooms?.[0]?.rentAmount ? Number(p.rooms[0].rentAmount) : 0,
+    status: (p.isPublished || (p as any).status === "PUBLISHED" ? "PUBLISHED" : "DRAFT") as any,
+    isAvailable: true,
+    isDeleted: false,
+    images: p.images || [],
+    amenities: p.amenities || [],
+    bedrooms: p.rooms?.length || 1,
+    bathrooms: 1,
+    sizeSqft: 650,
+    rating: 5.0,
+    reviewCount: 0,
+    verified: true,
+    createdAt: p.createdAt,
+  }));
 
   const rawLeases = extractData<LeaseItem[]>(leasesQuery.data);
-  const liveLeases = Array.isArray(rawLeases) ? rawLeases : null;
-  const leases = liveLeases !== null ? liveLeases : fallback.leases;
+  const liveLeases = Array.isArray(rawLeases) ? rawLeases : [];
+  const leases = liveLeases;
 
   return {
-    id: fallback.id,
+    id: user?.id || "",
     user,
-    owner: fallback.owner,
+    owner: {
+      id: user?.id || "",
+      userId: user?.id || "",
+      name: user?.name || "Owner",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      kycStatus: "APPROVED" as const,
+      documents: [],
+      propertyCount: properties.length,
+    },
     properties,
     allProperties: properties,
-    rooms: fallback.rooms,
-    viewings: fallback.viewings,
-    applications: fallback.applications,
+    rooms: [],
+    viewings: [],
+    applications: [],
     leases,
-    payments: fallback.payments,
-    bills: fallback.bills,
-    tickets: fallback.tickets,
-    managers: fallback.managers,
-    notifications: fallback.notifications,
+    payments: [],
+    bills: [],
+    tickets: [],
+    managers: [],
+    notifications: [],
     isLoading: propertiesQuery.isLoading || leasesQuery.isLoading,
 
     // Mutation triggers

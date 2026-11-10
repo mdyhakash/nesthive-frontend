@@ -6,9 +6,6 @@ import { BookingActions } from "@/components/marketing/booking-dialogs";
 import { ImageGallery } from "@/components/shared/image-gallery";
 import { RoomCard } from "@/components/shared/room-card";
 import { Badge } from "@/components/ui/badge";
-import { owners } from "@/data/users";
-import { getProperty } from "@/data/properties";
-import { roomsForProperty } from "@/data/rooms";
 import { formatBDT } from "@/lib/format";
 import type { Owner, Property, Room } from "@/types";
 
@@ -84,16 +81,10 @@ async function getPropertyDetails(id: string) {
       }
     }
   } catch {
-    // fallback
+    return null;
   }
 
-  const prop = getProperty(id);
-  if (!prop) return null;
-  return {
-    property: prop,
-    rooms: roomsForProperty(prop.id).filter((r) => r.isPublished),
-    owner: owners.find((o) => o.id === prop.ownerId),
-  };
+  return null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {

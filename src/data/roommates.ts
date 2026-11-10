@@ -181,16 +181,7 @@ interface Candidate {
   preference: Answers;
 }
 
-const candidates: Candidate[] = [
-  { id: "rm-1", name: "Nusrat Jahan", occupation: "Graduate student", area: "Dhanmondi", budget: 11000, preference: { sleepSchedule: "EARLY_BIRD", cleanliness: 4, smoking: "NO", pets: "FINE_WITH_PETS", guests: "RARELY", noise: "QUIET", budgetMin: 9000, budgetMax: 13000, genderPreference: "ANY" } },
-  { id: "rm-2", name: "Arman Hossain", occupation: "Data analyst", area: "Mirpur", budget: 13000, preference: { sleepSchedule: "EARLY_BIRD", cleanliness: 5, smoking: "NO", pets: "NO_PETS", guests: "RARELY", noise: "QUIET", budgetMin: 11000, budgetMax: 15000, genderPreference: "ANY" } },
-  { id: "rm-3", name: "Tasnim Rahman", occupation: "Pharmacist", area: "Mohammadpur", budget: 10000, preference: { sleepSchedule: "FLEXIBLE", cleanliness: 4, smoking: "NO", pets: "FINE_WITH_PETS", guests: "SOMETIMES", noise: "MODERATE", budgetMin: 8000, budgetMax: 12000, genderPreference: "ANY" } },
-  { id: "rm-4", name: "Arif Chowdhury", occupation: "Sales manager", area: "Banani", budget: 17000, preference: { sleepSchedule: "NIGHT_OWL", cleanliness: 3, smoking: "OUTSIDE", pets: "HAS_PETS", guests: "OFTEN", noise: "LIVELY", budgetMin: 14000, budgetMax: 20000, genderPreference: "ANY" } },
-  { id: "rm-5", name: "Sumaiya Sultana", occupation: "Content writer", area: "Uttara", budget: 9500, preference: { sleepSchedule: "NIGHT_OWL", cleanliness: 4, smoking: "NO", pets: "FINE_WITH_PETS", guests: "SOMETIMES", noise: "MODERATE", budgetMin: 8000, budgetMax: 11000, genderPreference: "ANY" } },
-  { id: "rm-6", name: "Rakib Hasan", occupation: "Civil engineer", area: "Dhanmondi", budget: 14000, preference: { sleepSchedule: "EARLY_BIRD", cleanliness: 3, smoking: "OUTSIDE", pets: "FINE_WITH_PETS", guests: "SOMETIMES", noise: "MODERATE", budgetMin: 11000, budgetMax: 16000, genderPreference: "ANY" } },
-  { id: "rm-7", name: "Mehzabin Noor", occupation: "Architect", area: "Gulshan", budget: 16000, preference: { sleepSchedule: "FLEXIBLE", cleanliness: 5, smoking: "NO", pets: "HAS_PETS", guests: "RARELY", noise: "QUIET", budgetMin: 13000, budgetMax: 18000, genderPreference: "FEMALE" } },
-  { id: "rm-8", name: "Zahid Hasan", occupation: "Consultant", area: "Banani", budget: 20000, preference: { sleepSchedule: "NIGHT_OWL", cleanliness: 2, smoking: "YES", pets: "NO_PETS", guests: "OFTEN", noise: "LIVELY", budgetMin: 18000, budgetMax: 24000, genderPreference: "ANY" } },
-];
+const candidates: Candidate[] = [];
 
 export function buildMatches(answers: Answers): RoommateMatch[] {
   return candidates

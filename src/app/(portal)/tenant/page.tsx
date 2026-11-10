@@ -66,7 +66,7 @@ export default function TenantDashboard() {
   return (
     <>
       <PageHeader
-        title="Welcome back, Rafiq"
+        title={`Welcome back, ${t.user?.name?.split(" ")[0] || "there"}`}
         description="Here is what needs your attention this month."
         action={
           <Button asChild>

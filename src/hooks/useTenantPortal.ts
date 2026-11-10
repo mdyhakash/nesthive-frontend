@@ -3,7 +3,6 @@ import { leaseApi, type LeaseItem } from "@/api/lease.api";
 import { viewingApi, type ViewingRequestItem } from "@/api/viewing.api";
 import { applicationApi, type ApplicationItem } from "@/api/application.api";
 import { useAuthStore } from "@/store/auth.store";
-import { useTenant } from "./use-tenant";
 import { extractData } from "@/lib/api-helper";
 import { toast } from "sonner";
 
@@ -16,7 +15,6 @@ export const TENANT_PORTAL_KEYS = {
 
 export function useTenantPortal() {
   const { user, isAuthenticated } = useAuthStore();
-  const fallback = useTenant();
   const queryClient = useQueryClient();
 
   const isTenant = isAuthenticated && (user?.role === "TENANT" || !user?.role);
@@ -79,61 +77,57 @@ export function useTenantPortal() {
     },
   });
 
-  // Merged active and past leases
+  // Live active and past leases
   const rawLeases = extractData<LeaseItem[]>(leasesQuery.data);
-  const liveLeases = Array.isArray(rawLeases) ? rawLeases : null;
-  const activeLease = liveLeases?.find((l) => l.status === "ACTIVE") || (liveLeases ? null : fallback.lease);
-  const pastLeases = liveLeases?.filter((l) => l.status === "TERMINATED") || (liveLeases ? [] : fallback.pastLeases);
+  const liveLeases = Array.isArray(rawLeases) ? rawLeases : [];
+  const activeLease = liveLeases.find((l) => l.status === "ACTIVE") || null;
+  const pastLeases = liveLeases.filter((l) => l.status === "TERMINATED");
 
-  // Merged viewing requests with normalized UI fields
+  // Live viewing requests with normalized UI fields
   const rawViewings = extractData<ViewingRequestItem[]>(viewingsQuery.data);
-  const liveViewings = Array.isArray(rawViewings) ? rawViewings : null;
-  const viewings = liveViewings !== null
-    ? liveViewings.map((v) => ({
-        id: v.id,
-        roomId: v.roomId,
-        propertyId: v.room?.property?.id || "p-1",
-        tenantId: v.tenantId,
-        tenantName: v.tenant?.name || "Tenant",
-        date: v.preferredDate,
-        timeSlot: v.preferredSlot,
-        status: v.status as any,
-        message: v.message || "",
-        createdAt: v.createdAt,
-      }))
-    : fallback.viewings;
+  const liveViewings = Array.isArray(rawViewings) ? rawViewings : [];
+  const viewings = liveViewings.map((v) => ({
+    id: v.id,
+    roomId: v.roomId,
+    propertyId: v.room?.property?.id || "",
+    tenantId: v.tenantId,
+    tenantName: v.tenant?.name || user?.name || "Tenant",
+    date: v.preferredDate,
+    timeSlot: v.preferredSlot,
+    status: v.status as any,
+    message: v.message || "",
+    createdAt: v.createdAt,
+  }));
 
-  // Merged applications with normalized UI fields
+  // Live applications with normalized UI fields
   const rawApps = extractData<ApplicationItem[]>(applicationsQuery.data);
-  const liveApplications = Array.isArray(rawApps) ? rawApps : null;
-  const applications = liveApplications !== null
-    ? liveApplications.map((a) => ({
-        id: a.id,
-        roomId: a.roomId,
-        propertyId: a.room?.property?.id || "p-1",
-        tenantId: a.tenantId,
-        tenantName: a.tenant?.name || "Tenant",
-        status: a.status as any,
-        moveInDate: a.proposedStartDate,
-        createdAt: a.createdAt,
-        updatedAt: a.updatedAt,
-      }))
-    : fallback.applications;
+  const liveApplications = Array.isArray(rawApps) ? rawApps : [];
+  const applications = liveApplications.map((a) => ({
+    id: a.id,
+    roomId: a.roomId,
+    propertyId: a.room?.property?.id || "",
+    tenantId: a.tenantId,
+    tenantName: a.tenant?.name || user?.name || "Tenant",
+    status: a.status as any,
+    moveInDate: a.proposedStartDate,
+    createdAt: a.createdAt,
+    updatedAt: a.updatedAt,
+  }));
 
   return {
-    id: fallback.id,
+    id: user?.id || "",
     user,
     lease: activeLease as any,
     activeLease,
     pastLeases,
     viewings,
     applications,
-    payments: fallback.payments,
-    dues: fallback.dues,
-    tickets: fallback.tickets,
-    splits: fallback.splits,
-    unpaidSplits: fallback.unpaidSplits,
-    notifications: fallback.notifications,
+    payments: [],
+    dues: [],
+    tickets: [],
+    splits: [],
+    unpaidSplits: [],
+    notifications: [],
     isLoading: leasesQuery.isLoading || viewingsQuery.isLoading || applicationsQuery.isLoading,
     cancelViewing: cancelViewingMutation.mutate,
     isCancellingViewing: cancelViewingMutation.isPending,

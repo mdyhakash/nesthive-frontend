@@ -15,12 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMockQuery } from "@/hooks/use-mock-query";
 import { useLookup } from "@/hooks/use-lookup";
-import { useTenant } from "@/hooks/use-tenant";
+import { useTenantPortal } from "@/hooks/useTenantPortal";
 import { formatBDT, formatDate, MOCK_NOW } from "@/lib/format";
 
 export default function TenantLease() {
   const d = useData();
-  const t = useTenant();
+  const t = useTenantPortal();
   const look = useLookup();
   const { status, retry } = useMockQuery(null);
   const [confirm, setConfirm] = React.useState(false);
@@ -32,6 +32,7 @@ export default function TenantLease() {
 
   const terminate = () => {
     if (!lease) return;
+    t.terminateLease({ id: lease.id });
     d.setLeases((prev) => prev.map((l) => (l.id === lease.id ? { ...l, status: "TERMINATED", terminatedAt: MOCK_NOW.toISOString() } : l)));
     d.audit({ actorId: t.id, actorName: lease.tenantName, actorRole: "TENANT", action: "UPDATE", entity: "Lease", entityId: lease.id, summary: `${lease.tenantName} terminated their lease` });
     toast.success("Lease terminated", { description: "Your owner has been notified." });

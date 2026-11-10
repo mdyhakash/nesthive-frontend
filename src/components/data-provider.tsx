@@ -68,19 +68,19 @@ const DataContext = React.createContext<DataContextValue | null>(null);
  * roles without any persistence or network.
  */
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  const [viewings, setViewings] = React.useState(seedViewings);
-  const [applications, setApplications] = React.useState(seedApplications);
-  const [leases, setLeases] = React.useState(seedLeases);
-  const [payments, setPayments] = React.useState(seedPayments);
-  const [bills, setBills] = React.useState(seedBills);
-  const [tickets, setTickets] = React.useState(seedTickets);
-  const [notifications, setNotifications] = React.useState(seedNotifications);
-  const [properties, setProperties] = React.useState(seedProperties);
-  const [rooms, setRooms] = React.useState(seedRooms);
-  const [owners, setOwners] = React.useState(seedOwners);
-  const [managers, setManagers] = React.useState(seedManagers);
-  const [users, setUsers] = React.useState(seedUsers);
-  const [auditLogs, setAuditLogs] = React.useState(seedAudit);
+  const [viewings, setViewings] = React.useState<ViewingRequest[]>(seedViewings);
+  const [applications, setApplications] = React.useState<Application[]>(seedApplications);
+  const [leases, setLeases] = React.useState<Lease[]>(seedLeases);
+  const [payments, setPayments] = React.useState<Payment[]>(seedPayments);
+  const [bills, setBills] = React.useState<UtilityBill[]>(seedBills);
+  const [tickets, setTickets] = React.useState<MaintenanceTicket[]>(seedTickets);
+  const [notifications, setNotifications] = React.useState<Notification[]>(seedNotifications);
+  const [properties, setProperties] = React.useState<Property[]>(seedProperties);
+  const [rooms, setRooms] = React.useState<Room[]>(seedRooms);
+  const [owners, setOwners] = React.useState<Owner[]>(seedOwners);
+  const [managers, setManagers] = React.useState<Manager[]>(seedManagers);
+  const [users, setUsers] = React.useState<User[]>(seedUsers);
+  const [auditLogs, setAuditLogs] = React.useState<AuditLog[]>(seedAudit);
   const counter = React.useRef(0);
 
   const audit = React.useCallback<DataContextValue["audit"]>((entry) => {

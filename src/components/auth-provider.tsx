@@ -1,14 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { demoAccounts } from "@/data/users";
+import { useAuthStore } from "@/store/auth.store";
 import { ROLE_STORAGE_KEY, ROLES } from "@/lib/roles";
 import type { Role, User } from "@/types";
 
-/**
- * Mock auth. There is no real session: the chosen role lives in React state and
- * localStorage so the portal can render the right shell. Nothing is sent anywhere.
- */
 interface AuthContextValue {
   role: Role | null;
   user: User | null;
@@ -23,42 +19,57 @@ const AuthContext = React.createContext<AuthContextValue | null>(null);
 
 function readStoredRole(): Role | null {
   try {
-    const stored = localStorage.getItem(ROLE_STORAGE_KEY);
-    return stored && (ROLES as string[]).includes(stored) ? (stored as Role) : null;
+    const stored = localStorage.getItem(ROLE_STORAGE_KEY) || localStorage.getItem("nesthive.role");
+    return stored && (ROLES as readonly string[]).includes(stored) ? (stored as Role) : null;
   } catch {
     return null;
   }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [role, setRole] = React.useState<Role | null>(null);
+  const store = useAuthStore();
+  const [role, setRole] = React.useState<Role | null>(() => store.role || readStoredRole());
   const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
-    setRole(readStoredRole());
+    const r = store.role || readStoredRole();
+    setRole(r);
     setReady(true);
-  }, []);
+  }, [store.role]);
 
   const persist = React.useCallback((next: Role | null) => {
     setRole(next);
     try {
-      if (next) localStorage.setItem(ROLE_STORAGE_KEY, next);
-      else localStorage.removeItem(ROLE_STORAGE_KEY);
+      if (next) {
+        localStorage.setItem(ROLE_STORAGE_KEY, next);
+        localStorage.setItem("nesthive.role", next);
+      } else {
+        localStorage.removeItem(ROLE_STORAGE_KEY);
+        localStorage.removeItem("nesthive.role");
+      }
     } catch {
-      /* storage unavailable — keep in-memory only */
+      /* storage unavailable */
     }
   }, []);
 
+  const logout = React.useCallback(() => {
+    persist(null);
+    store.clearAuth();
+  }, [persist, store]);
+
+  const currentUser = store.user;
+  const currentRole = store.role || role || (currentUser ? currentUser.role : null);
+
   const value = React.useMemo<AuthContextValue>(
     () => ({
-      role,
-      user: role ? demoAccounts[role] : null,
+      role: currentRole,
+      user: currentUser,
       ready,
       login: (r) => persist(r),
-      logout: () => persist(null),
+      logout,
       switchRole: (r) => persist(r),
     }),
-    [role, ready, persist],
+    [currentRole, currentUser, ready, persist, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

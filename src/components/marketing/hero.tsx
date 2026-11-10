@@ -11,7 +11,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AREAS } from "@/data/properties";
 import { TRUST_POINTS } from "@/data/marketing";
-import { properties } from "@/data/properties";
+import { useProperties } from "@/hooks/useProperties";
+import { extractData } from "@/lib/api-helper";
+import type { PropertyItem } from "@/api/property.api";
 import { formatBDT } from "@/lib/format";
 import { iconFor } from "@/lib/icons";
 import { floatLoop, heroContainer, heroItem } from "@/lib/motion";
@@ -19,13 +21,25 @@ import { floatLoop, heroContainer, heroItem } from "@/lib/motion";
 const RENT_OPTIONS = [8000, 12000, 16000, 20000, 30000];
 const ROOM_TYPES = ["Single", "Shared", "Master bedroom", "Seat"];
 
-const floaters = [properties[0], properties[1]];
-
 export function Hero() {
   const router = useRouter();
   const [area, setArea] = React.useState("any");
   const [maxRent, setMaxRent] = React.useState("any");
   const [roomType, setRoomType] = React.useState("any");
+
+  const { data: apiData } = useProperties();
+  const rawItems = extractData<PropertyItem[]>(apiData);
+  const backendItems = Array.isArray(rawItems) ? rawItems : [];
+  const floaters = React.useMemo(() => {
+    return backendItems.slice(0, 2).map((b) => ({
+      id: b.id,
+      title: b.title,
+      area: b.area,
+      rent: b.rooms?.[0]?.rentAmount ? Number(b.rooms[0].rentAmount) : 0,
+      rating: 4.8,
+      images: b.images && b.images.length > 0 ? b.images : ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&auto=format&fit=crop&q=80"],
+    }));
+  }, [backendItems]);
 
   function onSearch(e: React.FormEvent) {
     e.preventDefault();

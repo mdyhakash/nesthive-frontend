@@ -25,7 +25,7 @@ export default function ManagerDashboard() {
 
   return (
     <>
-      <PageHeader title={`Hello, ${m.manager.name.split(" ")[0]}`} description="What needs attention across the properties you manage." action={<Button asChild><Link href="/manager/maintenance">Open queue</Link></Button>} />
+      <PageHeader title={`Hello, ${m.manager.name ? m.manager.name.split(" ")[0] : "Manager"}`} description="What needs attention across the properties you manage." action={<Button asChild><Link href="/manager/maintenance">Open queue</Link></Button>} />
       {status === "loading" && (
         <div role="status" aria-label="Loading" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }, (_, i) => <Skeleton key={i} className="h-28" />)}

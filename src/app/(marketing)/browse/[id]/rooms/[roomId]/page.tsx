@@ -9,8 +9,6 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getProperty } from "@/data/properties";
-import { getRoom, occupantsForRoom, roomsForProperty } from "@/data/rooms";
 import { formatBDT, formatDate } from "@/lib/format";
 import type { Property, Room } from "@/types";
 
@@ -82,17 +80,10 @@ async function fetchLiveRoomDetails(propertyId: string, roomId: string) {
       }
     }
   } catch {
-    // fallback
+    return null;
   }
 
-  const prop = getProperty(propertyId);
-  const rm = getRoom(roomId);
-  if (!prop || !rm) return null;
-  return {
-    property: prop,
-    room: rm,
-    siblings: roomsForProperty(prop.id).filter((r) => r.isPublished),
-  };
+  return null;
 }
 
 export async function generateMetadata({

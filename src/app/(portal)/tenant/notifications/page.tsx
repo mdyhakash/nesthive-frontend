@@ -1,8 +1,9 @@
 "use client";
 
 import { NotificationsView } from "@/components/portal/notifications-view";
-import { CURRENT_TENANT_ID } from "@/data/users";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function TenantNotifications() {
-  return <NotificationsView userId={CURRENT_TENANT_ID} />;
+  const { user } = useAuthStore();
+  return <NotificationsView userId={user?.id || ""} />;
 }
