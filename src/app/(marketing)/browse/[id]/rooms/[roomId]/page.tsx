@@ -15,9 +15,11 @@ import type { Property, Room, RoomOccupant } from "@/types";
 
 export const dynamic = "force-dynamic";
 
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://nesthive-backend.vercel.app/api/v1").replace(/\/+$/, "");
+
 async function fetchLiveRoomDetails(propertyId: string, roomId: string) {
   try {
-    const res = await fetch(`https://nesthive-backend.vercel.app/api/v1/property/${propertyId}`, {
+    const res = await fetch(`${API_BASE}/property/${propertyId}`, {
       cache: "no-store",
     });
     if (res.ok) {

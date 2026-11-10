@@ -1,14 +1,18 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { ApiErrorResponse } from "@/types/api.types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://nesthive-backend.vercel.app/api/v1";
+const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://nesthive-backend.vercel.app/api/v1";
+const BASE_URL = rawUrl.replace(/\/+$/, "");
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true,
+  // withCredentials disabled so browser does not block cross-origin requests
+  // when backend uses wildcard origin or does not explicitly echo credentials header.
+  // JWT tokens are passed via standard Authorization Bearer header below.
+  withCredentials: false,
 });
 
 // Request interceptor: attach bearer token if available
