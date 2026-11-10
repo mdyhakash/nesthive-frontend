@@ -30,9 +30,41 @@ Modern, fullstack-ready housing and roommate discovery and management platform b
 | Role | Email | Password | Quick Action |
 |:---|:---|:---|:---|
 | **Admin** | `admin@gmail.com` | `Admin123@` | 1-Click Demo Button on `/login` |
-| **Owner** | `owner@gmail.com` | `Owner123@` | 1-Click Demo Button on `/login` |
+| **Owner (Provider)** | `owner@gmail.com` | `Owner123@` | 1-Click Demo Button on `/login` |
+| **Tenant (User)** | `tenant@gmail.com` | `Tenant123@` | 1-Click Demo Button on `/login` |
 | **Manager** | `manager@gmail.com` | `Manager123@` | 1-Click Demo Button on `/login` |
-| **Tenant** | Demo session / Register | Any valid password | Sign up or test as renter |
+
+---
+
+## 💳 Payment Gateway Integration (bKash & SSLCommerz / Stripe Test Mode)
+
+- **Payment Methods**: bKash Mobile Financial Service & SSLCommerz / Stripe Test Mode.
+- **Success Flow**: Verified redirect to `/payment/success` with transaction receipts, invoice details, and printing capability.
+- **Cancellation Flow**: Graceful redirect to `/payment/cancel` with error diagnostics and immediate retry options.
+
+---
+
+## 🛡️ Next.js 16 Proxy Architecture
+
+The project adheres to Next.js 16 conventions:
+- **`src/proxy.ts`**: Replaces legacy middleware to provide performant server-side route guards, cookie verification (`nesthive.token`, `nesthive.role`), and Role-Based Access Control (RBAC) across `/admin`, `/owner`, `/tenant`, and `/manager`.
+- **App Router Boundaries**: `not-found.tsx` (custom 404), `error.tsx` (global error boundary), and `loading.tsx` (skeleton loaders).
+
+---
+
+## 📋 Assignment Submission Details
+
+```text
+Project Name            : Housing & Roommate Platform (NestHive)
+Domain Number           : 6 (Housing & Roommate Platform 🏠)
+Backend Repo            : https://github.com/mdyhakash/nesthive-backend
+Frontend Repo           : https://github.com/mdyhakash/nesthive-frontend
+Live Backend URL        : https://nesthive-backend.vercel.app/api/v1
+Live Frontend URL       : https://nesthive.vercel.app
+API Documentation       : https://nesthive-backend.vercel.app/api-docs
+Demo Admin Email        : admin@gmail.com
+Demo Admin Password     : Admin123@
+```
 
 ---
 

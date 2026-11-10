@@ -47,59 +47,89 @@ export function LoginForm() {
       {/* 🚀 Mandatory One-Click Demo Login Section */}
       <div className="mt-6 rounded-2xl border border-border bg-card/60 p-4 shadow-sm backdrop-blur">
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
             1-Click Quick Demo Login
           </span>
-          <span className="text-xs text-muted-foreground font-mono">Live API Connected</span>
+          <span className="text-[11px] font-mono text-muted-foreground">Live API Connected</span>
         </div>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <Button
+
+        <div className="grid grid-cols-2 gap-2.5">
+          {/* Admin */}
+          <button
             type="button"
-            variant="outline"
-            size="sm"
             disabled={loginMutation.isPending}
             onClick={() => handleDemoLogin("admin@gmail.com", "Admin123@", "ADMIN")}
-            className="flex items-center justify-center gap-1.5 border-border hover:border-primary hover:bg-primary/5 text-xs font-semibold h-10 rounded-xl"
+            className="group flex flex-col items-start gap-1 rounded-xl border border-border/80 bg-background/60 p-2.5 text-left transition-all hover:border-primary/50 hover:bg-primary/5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"
           >
-            <ShieldCheck className="size-3.5 text-primary" />
-            Admin
-          </Button>
+            <div className="flex w-full items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-bold text-foreground group-hover:text-primary">
+                <ShieldCheck className="size-3.5 text-primary shrink-0" />
+                Admin
+              </span>
+              <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                Platform
+              </span>
+            </div>
+            <span className="line-clamp-1 text-[11px] text-muted-foreground">admin@gmail.com</span>
+          </button>
 
-          <Button
+          {/* Owner (Provider) */}
+          <button
             type="button"
-            variant="outline"
-            size="sm"
             disabled={loginMutation.isPending}
             onClick={() => handleDemoLogin("owner@gmail.com", "Owner123@", "OWNER")}
-            className="flex items-center justify-center gap-1.5 border-border hover:border-secondary hover:bg-secondary/5 text-xs font-semibold h-10 rounded-xl"
+            className="group flex flex-col items-start gap-1 rounded-xl border border-border/80 bg-background/60 p-2.5 text-left transition-all hover:border-secondary/50 hover:bg-secondary/5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary disabled:opacity-50"
           >
-            <HomeIcon className="size-3.5 text-secondary" />
-            Owner (Provider)
-          </Button>
+            <div className="flex w-full items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-bold text-foreground group-hover:text-secondary">
+                <HomeIcon className="size-3.5 text-secondary shrink-0" />
+                Owner
+              </span>
+              <span className="rounded-md bg-secondary/10 px-1.5 py-0.5 text-[10px] font-semibold text-secondary">
+                Provider
+              </span>
+            </div>
+            <span className="line-clamp-1 text-[11px] text-muted-foreground">owner@gmail.com</span>
+          </button>
 
-          <Button
+          {/* Tenant (User) */}
+          <button
             type="button"
-            variant="outline"
-            size="sm"
             disabled={loginMutation.isPending}
             onClick={() => handleDemoLogin("tenant@gmail.com", "Tenant123@", "TENANT")}
-            className="flex items-center justify-center gap-1.5 border-border hover:border-teal-500 hover:bg-teal-500/5 text-xs font-semibold h-10 rounded-xl"
+            className="group flex flex-col items-start gap-1 rounded-xl border border-border/80 bg-background/60 p-2.5 text-left transition-all hover:border-teal-500/50 hover:bg-teal-500/5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:opacity-50"
           >
-            <UserCheck className="size-3.5 text-teal-600 dark:text-teal-400" />
-            Tenant (User)
-          </Button>
+            <div className="flex w-full items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-bold text-foreground group-hover:text-teal-600 dark:group-hover:text-teal-400">
+                <UserCheck className="size-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                Tenant
+              </span>
+              <span className="rounded-md bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-teal-700 dark:text-teal-300">
+                User
+              </span>
+            </div>
+            <span className="line-clamp-1 text-[11px] text-muted-foreground">tenant@gmail.com</span>
+          </button>
 
-          <Button
+          {/* Manager */}
+          <button
             type="button"
-            variant="outline"
-            size="sm"
             disabled={loginMutation.isPending}
             onClick={() => handleDemoLogin("manager@gmail.com", "Manager123@", "MANAGER")}
-            className="flex items-center justify-center gap-1.5 border-border hover:border-accent-foreground text-xs font-semibold h-10 rounded-xl"
+            className="group flex flex-col items-start gap-1 rounded-xl border border-border/80 bg-background/60 p-2.5 text-left transition-all hover:border-border hover:bg-muted/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground disabled:opacity-50"
           >
-            <UserCheck className="size-3.5 text-foreground" />
-            Manager
-          </Button>
+            <div className="flex w-full items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                <UserCheck className="size-3.5 text-foreground shrink-0" />
+                Manager
+              </span>
+              <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                Staff
+              </span>
+            </div>
+            <span className="line-clamp-1 text-[11px] text-muted-foreground">manager@gmail.com</span>
+          </button>
         </div>
       </div>
 
