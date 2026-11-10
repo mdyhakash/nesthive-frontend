@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
+import { AlertCircle, CheckCircle2, CreditCard, Loader2, ShieldCheck } from "lucide-react";
 import { OtpInput } from "@/components/auth/otp-input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -202,10 +203,39 @@ export function BkashCheckout({
                 </div>
                 {item.detail && <p className="rounded-xl bg-bkash-soft px-4 py-3 text-sm">{item.detail}</p>}
                 <Button type="submit" variant="bkash" size="lg">
-                  Confirm
+                  Confirm bKash Payment
                 </Button>
-                <Button type="button" variant="ghost" onClick={close}>
-                  Close
+
+                <div className="relative my-1 text-center">
+                  <span className="text-xs uppercase tracking-wider text-muted-foreground">or pay with card</span>
+                </div>
+
+                <Button
+                  asChild
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs font-semibold rounded-xl"
+                >
+                  <Link
+                    href={`/payment/success?tran_id=SSL-${Math.random().toString(36).substring(2, 9).toUpperCase()}&amount=${item.amount}&type=${encodeURIComponent(item.label)}&method=SSLCommerz%20/%20Stripe%20Test%20Mode`}
+                    onClick={() => {
+                      onSuccess(`SSL-${Math.random().toString(36).substring(2, 9).toUpperCase()}`, "Card Gateway");
+                      onOpenChange(false);
+                    }}
+                  >
+                    <CreditCard className="size-3.5 mr-1 text-primary" />
+                    Pay via SSLCommerz / Stripe (Test Mode)
+                  </Link>
+                </Button>
+
+                <Button asChild type="button" variant="ghost" size="sm" className="text-muted-foreground text-xs">
+                  <Link
+                    href={`/payment/cancel?reason=${encodeURIComponent("Cancelled from checkout sheet")}&type=${encodeURIComponent(item.label)}`}
+                    onClick={close}
+                  >
+                    Cancel transaction
+                  </Link>
                 </Button>
               </motion.form>
             )}
@@ -298,9 +328,19 @@ export function BkashCheckout({
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <ShieldCheck className="size-3.5" aria-hidden="true" /> Demo only. No money moved.
                 </p>
-                <Button type="button" size="lg" className="w-full" onClick={() => onOpenChange(false)}>
-                  Done
-                </Button>
+                <div className="flex w-full flex-col gap-2 pt-2">
+                  <Button asChild size="lg" className="w-full rounded-xl">
+                    <Link
+                      href={`/payment/success?tran_id=${trx}&amount=${item.amount}&type=${encodeURIComponent(item.label)}&method=bKash`}
+                      onClick={() => onOpenChange(false)}
+                    >
+                      View Official Receipt
+                    </Link>
+                  </Button>
+                  <Button type="button" variant="outline" size="lg" className="w-full rounded-xl" onClick={() => onOpenChange(false)}>
+                    Close
+                  </Button>
+                </div>
               </motion.div>
             )}
 
@@ -313,21 +353,31 @@ export function BkashCheckout({
                 <p className="text-sm text-muted-foreground">
                   Your bKash account doesn&apos;t have enough balance for {formatBDT(item.amount)}. You were not charged.
                 </p>
-                <Button
-                  type="button"
-                  variant="bkash"
-                  size="lg"
-                  className="w-full"
-                  onClick={() => {
-                    setPin("");
-                    setStep("pin");
-                  }}
-                >
-                  Try again
-                </Button>
-                <Button type="button" variant="ghost" className="w-full" onClick={() => onOpenChange(false)}>
-                  Close
-                </Button>
+                <div className="flex w-full flex-col gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="bkash"
+                    size="lg"
+                    className="w-full rounded-xl"
+                    onClick={() => {
+                      setPin("");
+                      setStep("pin");
+                    }}
+                  >
+                    Try again
+                  </Button>
+                  <Button asChild variant="outline" className="w-full rounded-xl">
+                    <Link
+                      href={`/payment/cancel?reason=${encodeURIComponent("Insufficient balance or payment failure")}&type=${encodeURIComponent(item.label)}`}
+                      onClick={() => onOpenChange(false)}
+                    >
+                      View Cancellation Details
+                    </Link>
+                  </Button>
+                  <Button type="button" variant="ghost" className="w-full" onClick={() => onOpenChange(false)}>
+                    Close
+                  </Button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

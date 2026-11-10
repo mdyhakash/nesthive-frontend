@@ -23,6 +23,8 @@ export const useAuthStore = create<AuthState>()(
         if (typeof window !== "undefined") {
           localStorage.setItem("nesthive.token", token);
           localStorage.setItem("nesthive.role", user.role);
+          document.cookie = `nesthive.token=${encodeURIComponent(token)}; path=/; max-age=604800; SameSite=Lax`;
+          document.cookie = `nesthive.role=${encodeURIComponent(user.role)}; path=/; max-age=604800; SameSite=Lax`;
         }
         set({
           user,
@@ -32,14 +34,22 @@ export const useAuthStore = create<AuthState>()(
         });
       },
       updateUser: (updatedUser: Partial<User>) =>
-        set((state) => ({
-          user: state.user ? { ...state.user, ...updatedUser } : null,
-          role: updatedUser.role ?? state.role,
-        })),
+        set((state) => {
+          const nextRole = updatedUser.role ?? state.role;
+          if (typeof window !== "undefined" && nextRole) {
+            document.cookie = `nesthive.role=${encodeURIComponent(nextRole)}; path=/; max-age=604800; SameSite=Lax`;
+          }
+          return {
+            user: state.user ? { ...state.user, ...updatedUser } : null,
+            role: nextRole,
+          };
+        }),
       clearAuth: () => {
         if (typeof window !== "undefined") {
           localStorage.removeItem("nesthive.token");
           localStorage.removeItem("nesthive.role");
+          document.cookie = "nesthive.token=; path=/; max-age=0";
+          document.cookie = "nesthive.role=; path=/; max-age=0";
         }
         set({
           user: null,

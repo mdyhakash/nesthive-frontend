@@ -1,17 +1,16 @@
 "use client";
 
-import * as React from "react";
-import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { GoogleButton, OrDivider } from "@/components/auth/google-button";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { loginSchema, type LoginValues } from "@/lib/validation";
 import { useLoginMutation } from "@/hooks/useAuthMutations";
-import { ShieldCheck, Home as HomeIcon, UserCheck, Loader2 } from "lucide-react";
+import { loginSchema, type LoginValues } from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Home as HomeIcon, Loader2, ShieldCheck, UserCheck } from "lucide-react";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
 
 export function LoginForm() {
   const loginMutation = useLoginMutation();
@@ -49,11 +48,11 @@ export function LoginForm() {
       <div className="mt-6 rounded-2xl border border-border bg-card/60 p-4 shadow-sm backdrop-blur">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            🚀 1-Click Quick Demo Login
+            1-Click Quick Demo Login
           </span>
           <span className="text-xs text-muted-foreground font-mono">Live API Connected</span>
         </div>
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <Button
             type="button"
             variant="outline"
@@ -63,7 +62,7 @@ export function LoginForm() {
             className="flex items-center justify-center gap-1.5 border-border hover:border-primary hover:bg-primary/5 text-xs font-semibold h-10 rounded-xl"
           >
             <ShieldCheck className="size-3.5 text-primary" />
-            Admin Demo
+            Admin
           </Button>
 
           <Button
@@ -75,7 +74,19 @@ export function LoginForm() {
             className="flex items-center justify-center gap-1.5 border-border hover:border-secondary hover:bg-secondary/5 text-xs font-semibold h-10 rounded-xl"
           >
             <HomeIcon className="size-3.5 text-secondary" />
-            Owner Demo
+            Owner (Provider)
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={loginMutation.isPending}
+            onClick={() => handleDemoLogin("tenant@gmail.com", "Tenant123@", "TENANT")}
+            className="flex items-center justify-center gap-1.5 border-border hover:border-teal-500 hover:bg-teal-500/5 text-xs font-semibold h-10 rounded-xl"
+          >
+            <UserCheck className="size-3.5 text-teal-600 dark:text-teal-400" />
+            Tenant (User)
           </Button>
 
           <Button
@@ -87,7 +98,7 @@ export function LoginForm() {
             className="flex items-center justify-center gap-1.5 border-border hover:border-accent-foreground text-xs font-semibold h-10 rounded-xl"
           >
             <UserCheck className="size-3.5 text-foreground" />
-            Manager Demo
+            Manager
           </Button>
         </div>
       </div>
