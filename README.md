@@ -1,159 +1,140 @@
-# 🏠 NestHive — Fullstack Housing & Roommate Platform
+# 🏠 NestHive — Frontend
 
-Modern, fullstack-ready housing and roommate discovery and management platform built with **Next.js (App Router)**, **TanStack Query (React Query)**, **Axios**, **Zustand**, and **Tailwind CSS**. Built according to Programming Hero B7A7 specifications and integrated with the live NestHive Backend API.
+Find your room. Find your people. A Next.js frontend for a three-sided housing & roommate platform — tenants browse verified listings, apply for rooms, and split utilities; owners list properties, review tenant applications, and collect rent; admins oversee KYC verification, user moderation, and audit logs.
 
----
-
-## 🌟 Live Links & API References
-
-- **Live Backend API**: [https://nesthive-backend.vercel.app/api/v1](https://nesthive-backend.vercel.app/api/v1)
-- **API Documentation (Swagger UI)**: [https://nesthive-backend.vercel.app/api-docs](https://nesthive-backend.vercel.app/api-docs)
+Live: `https://nesthive-frontend.vercel.app/` · Backend: `https://nesthive-backend.vercel.app/api/v1` · API Docs: `https://nesthive-backend.vercel.app/api-docs`
 
 ---
 
-## 🚀 Key Features
+## Screenshots
 
-- **Decoupled Architecture**: Strict separation of concerns — **zero business logic in components**. All server queries, mutations, filtering and state updates are encapsulated in custom hooks (`src/hooks/`).
-- **Data Fetching & Cache Management**: **TanStack Query (React Query v5)** with custom query key factories and cache invalidation.
-- **HTTP Client**: Centralized Axios client (`src/api/client.ts`) with Bearer token request interceptor and unified error handling.
-- **State Management**: **Zustand** stores (`src/store/auth.store.ts`, `src/store/ui.store.ts`) with `localStorage` persistence.
-- **Centralized Route Constants**: Role-based route definitions in `src/routes/` (`public`, `auth`, `tenant`, `owner`, `admin`).
-- **Form Validation**: **React Hook Form + Zod** schemas for robust, accessible type-safe validations.
-- **One-Click Quick Demo Login**: Instant login buttons for **Admin**, **Owner**, and **Manager** directly executing live API requests with token storage.
-- **Multi-Role Portals**: Complete dashboard workflows for Tenant, Property Owner, Manager, and Platform Admin.
-- **Fintech Integration**: Full bKash mobile banking checkout simulation for rent, security deposits, and utility bill splits.
+*(Place application dashboard and browse screenshots here)*
 
 ---
 
-## 🔑 Demo Credentials (Live API Connected)
+## Tech Stack
 
-| Role | Email | Password | Quick Action |
-|:---|:---|:---|:---|
-| **Admin** | `admin@gmail.com` | `Admin123@` | 1-Click Demo Button on `/login` |
-| **Owner (Provider)** | `owner@gmail.com` | `Owner123@` | 1-Click Demo Button on `/login` |
-| **Tenant (User)** | `tenant@gmail.com` | `Tenant123@` | 1-Click Demo Button on `/login` |
-| **Manager** | `manager@gmail.com` | `Manager123@` | 1-Click Demo Button on `/login` |
-
----
-
-## 💳 Payment Gateway Integration (bKash & SSLCommerz / Stripe Test Mode)
-
-- **Payment Methods**: bKash Mobile Financial Service & SSLCommerz / Stripe Test Mode.
-- **Success Flow**: Verified redirect to `/payment/success` with transaction receipts, invoice details, and printing capability.
-- **Cancellation Flow**: Graceful redirect to `/payment/cancel` with error diagnostics and immediate retry options.
+- **Next.js 16** — App Router, Server Components, `proxy.ts` for edge-level auth & RBAC (Next.js 16's official successor to `middleware.ts`)
+- **TypeScript**
+- **Tailwind CSS v4** + shadcn/ui (Radix primitives)
+- **TanStack Query (React Query v5)** + **Zustand** — Server state caching, optimistic updates, and persistent auth session (`localStorage` + cookies)
+- **React Hook Form + Zod** — Type-safe client validation and multi-step creation wizard (`PropertyForm`)
+- **Recharts** — Interactive platform analytics, occupancy rates, and revenue distribution charts
+- **JWT Auth & Cookies** — Access token in Bearer header and `nesthive.token`/`nesthive.role` cookies for SSR route protection in `proxy.ts`
+- **bKash & SSLCommerz / Stripe Test Mode** — Mobile banking & card checkout with `/payment/success` and `/payment/cancel` redirect targets
 
 ---
 
-## 🛡️ Next.js 16 Proxy Architecture
+## Getting Started
 
-The project adheres to Next.js 16 conventions:
-- **`src/proxy.ts`**: Replaces legacy middleware to provide performant server-side route guards, cookie verification (`nesthive.token`, `nesthive.role`), and Role-Based Access Control (RBAC) across `/admin`, `/owner`, `/tenant`, and `/manager`.
-- **App Router Boundaries**: `not-found.tsx` (custom 404), `error.tsx` (global error boundary), and `loading.tsx` (skeleton loaders).
+### 1. Install
 
----
-
-## 📋 Assignment Submission Details
-
-```text
-Project Name            : Housing & Roommate Platform (NestHive)
-Domain Number           : 6 (Housing & Roommate Platform 🏠)
-Backend Repo            : https://github.com/mdyhakash/nesthive-backend
-Frontend Repo           : https://github.com/mdyhakash/nesthive-frontend
-Live Backend URL        : https://nesthive-backend.vercel.app/api/v1
-Live Frontend URL       : https://nesthive.vercel.app
-API Documentation       : https://nesthive-backend.vercel.app/api-docs
-Demo Admin Email        : admin@gmail.com
-Demo Admin Password     : Admin123@
-```
-
----
-
-## 🏗️ Project Architecture & Folder Structure
-
-Following strict architectural conventions:
-```
-nesthive-frontend/
-├── src/
-│   ├── api/                   # File-based API services (Axios client)
-│   │   ├── client.ts          # Central Axios instance with interceptors
-│   │   ├── auth.api.ts        # Login, register, profile, change password
-│   │   ├── user.api.ts        # User query and status updates
-│   │   ├── property.api.ts    # Property CRUD, filtering, pagination
-│   │   ├── room.api.ts        # Room CRUD and assignment
-│   │   ├── viewing.api.ts     # Viewing requests and scheduling
-│   │   ├── application.api.ts # Rental applications and approvals
-│   │   ├── lease.api.ts       # Tenant and owner leases
-│   │   ├── maintenance.api.ts # Maintenance ticket lifecycle
-│   │   ├── utility.api.ts     # Utility bills and split payments
-│   │   ├── payment.api.ts     # Rent, deposit & bKash transactions
-│   │   ├── admin.api.ts       # Platform overview, KYC and audit logs
-│   │   └── index.ts           # Unified API export
-│   ├── hooks/                 # Custom Hooks (ALL business logic lives here)
-│   │   ├── useAuthMutations.ts# Login, registration, password mutations
-│   │   ├── useUserProfile.ts  # Current authenticated user profile
-│   │   ├── useProperties.ts   # Property TanStack queries & mutations
-│   │   ├── useRooms.ts        # Room queries & mutations
-│   │   ├── useBrowse.ts       # Discovery, search, filter and pagination
-│   │   ├── useTenantPortal.ts # Tenant leases, applications & viewings
-│   │   ├── useOwnerPortal.ts  # Owner properties, leases & applications
-│   │   ├── useMaintenance.ts  # Maintenance tickets
-│   │   ├── usePayment.ts      # Rent & bKash payments
-│   │   ├── useAdmin.ts        # Admin overview, KYC approval & user block
-│   │   └── index.ts           # Unified hooks export
-│   ├── store/                 # Zustand state management
-│   │   ├── auth.store.ts      # Authentication tokens and user profile
-│   │   ├── ui.store.ts        # Theme, sidebar and drawer states
-│   │   └── index.ts
-│   ├── providers/             # Global application providers
-│   │   ├── query-provider.tsx # TanStack QueryClientProvider & DevTools
-│   │   ├── theme-provider.tsx # next-themes Dark/Light mode provider
-│   │   └── index.tsx          # Combined root providers wrapper
-│   ├── routes/                # Centralized role-based route paths
-│   │   ├── public.routes.ts   # Public marketing routes
-│   │   ├── auth.routes.ts     # Authentication routes
-│   │   ├── tenant.routes.ts   # Tenant portal routes
-│   │   ├── owner.routes.ts    # Owner portal routes
-│   │   ├── admin.routes.ts    # Admin portal routes
-│   │   └── index.ts
-│   ├── components/            # Pure presentational UI components
-│   │   ├── auth/              # Login, register, verify forms
-│   │   ├── marketing/         # Landing, browse and room cards
-│   │   ├── portal/            # Sidebar, topbar, maintenance, forms
-│   │   ├── shared/            # Data tables, stat cards, empty states
-│   │   └── ui/                # Accessible Radix primitives
-│   ├── types/                 # TypeScript interfaces and API schemas
-│   └── app/                   # Next.js App Router layout and pages
-```
-
----
-
-## 🛠️ Setup & Local Development
-
-### 1. Clone the repository
 ```bash
-git clone https://github.com/mdyhakash/nesthive-frontend.git
-cd nesthive-frontend
+npm install
 ```
 
-### 2. Environment Variables
-Create a `.env.local` file in the root directory:
+### 2. Environment
+
+Create `.env.local` in the project root:
+
 ```env
 NEXT_PUBLIC_API_URL=https://nesthive-backend.vercel.app/api/v1
 ```
 
-### 3. Install dependencies
-```bash
-npm install --legacy-peer-deps
-```
+### 3. Run
 
-### 4. Run Development Server
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-### 5. Production Build Verification
+Open [http://localhost:3000](http://localhost:3000)
+
+### 4. Demo Credentials (1-Click Login Ready)
+
+The `/login` page features distinct, one-click "Demo Login" buttons for each role:
+
+| Role | Email | Password | Dashboard Redirect |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@gmail.com` | `Admin123@` | `/admin` |
+| **Owner (Provider)** | `owner@gmail.com` | `Owner123@` | `/owner` |
+| **Tenant (User)** | `tenant@gmail.com` | `Tenant123@` | `/tenant` |
+| **Manager (Staff)** | `manager@gmail.com` | `Manager123@` | `/manager` |
+
+---
+
+## Roles
+
+| Role | Dashboard | Can do |
+| :--- | :--- | :--- |
+| **Tenant (Customer)** | `/tenant` | Browse & search rooms, schedule viewings, submit rental applications, digitally manage leases, pay rent/deposits with bKash/SSLCommerz, split utilities, submit maintenance tickets, roommate matching |
+| **Owner (Provider)** | `/owner` | Create & manage properties via multi-step wizard, manage rooms & pricing, review viewing requests, approve/reject tenant applications, generate utility split bills, submit KYC identity documents |
+| **Admin** | `/admin` | Platform overview & metrics (Recharts), verify/reject owner KYC documents, activate/block users, oversee all platform leases, monitor transactions, review platform maintenance queue & audit logs |
+| **Manager (Staff)** | `/manager` | Manage assigned properties, resolve maintenance requests, coordinate room occupancies |
+
+Role access is strictly enforced by `src/proxy.ts`: unauthenticated visitors to protected routes are redirected to `/login?redirect=...`; authenticated users visiting a route belonging to another role are redirected to their own role dashboard.
+
+---
+
+## Project Structure
+
+```
+src/
+├── api/                   — Axios service modules (client.ts, auth.api.ts, property.api.ts, lease.api.ts, etc.)
+├── app/
+│   ├── (auth)/            — /login (with 1-Click Demo Login), /register, /verify-email, /forgot-password, /reset-password
+│   ├── (marketing)/       — /, /about, /browse, /browse/[id], /browse/[id]/rooms/[roomId], /contact, /faq, /for-owners, /for-tenants, /how-it-works
+│   ├── (portal)/
+│   │   ├── admin/         — admin: overview, users, kyc, leases, payments, maintenance, audit, profile
+│   │   ├── owner/         — owner: overview, properties, new property wizard, rooms, applications, viewings, utilities, managers, kyc, payments
+│   │   ├── tenant/        — tenant: overview, lease, viewings, applications, payments, utilities, maintenance, roommates, notifications
+│   │   └── manager/       — manager: overview, properties, maintenance, profile
+│   ├── payment/           — /payment/success, /payment/cancel (Gateway redirect targets with receipt print)
+│   ├── not-found.tsx      — Custom 404 page
+│   ├── error.tsx          — Global error boundary ("use client")
+│   └── loading.tsx        — Global skeleton loader
+├── components/
+│   ├── auth/              — login form with 1-click demo buttons, registration, password inputs, otp input
+│   ├── marketing/         — hero, featured properties, search filters, testimonials, bento grid
+│   ├── portal/            — role switcher, topbar, sidebar, property form wizard, bkash checkout modal, chart cards
+│   ├── shared/            — data table, property card, room card, confirm dialog, empty state, pagination
+│   └── ui/                — button, dialog, input, select, badge, progress, skeleton, sonner toast
+├── hooks/                 — Custom hooks (useProperties, useBrowse, useTenantPortal, useOwnerPortal, useAdmin, usePayment, etc.)
+├── store/                 — Zustand global state (auth.store.ts with localStorage & cookie persistence)
+├── proxy.ts               — Next.js 16 Server-side route protection & RBAC middleware
+└── types/                 — Domain interfaces & TypeScript definitions
+```
+
+---
+
+## Key Flows
+
+**Tenant (Customer) Rental Flow:**
+Browse/filter rooms by area/budget (`/browse`) → inspect room & property details (`/browse/[id]/rooms/[roomId]`) → request a viewing slot (`PENDING`) → owner approves viewing (`CONFIRMED`) → submit rental application with move-in date (`SUBMITTED`) → owner approves application (`APPROVED`) → digital lease created (`ACTIVE`) → pay deposit & monthly rent via bKash or SSLCommerz/Stripe Test Mode → redirected to `/payment/success` with receipt → submit maintenance tickets or split monthly utilities.
+
+**Owner (Provider) Listing & Management Flow:**
+Complete KYC document submission (`/owner/kyc`) → once verified by admin, create listing via 4-step wizard (`/owner/properties/new`) → add individual rooms and set capacities/pricing (`/owner/properties/[id]/rooms`) → publish listing live to `/browse` → receive incoming viewing requests & applications → approve qualified tenants → monitor monthly income & active leases.
+
+**Admin Platform Moderation Flow:**
+Review platform analytics & growth charts (`/admin`) → inspect pending KYC submissions with NID & ownership deed previews (`/admin/kyc`) → approve or reject KYC with reason → manage user statuses (`ACTIVE` / `BLOCKED`) (`/admin/users`) → audit all system operations and transaction trails (`/admin/audit`).
+
+---
+
+## Design Notes / Known Constraints
+
+- **Next.js 16 `proxy.ts` Architecture.** Next.js 16 formally renamed `middleware.ts` to `proxy.ts`. Route security, cookie parsing (`nesthive.token`, `nesthive.role`), and RBAC redirects happen server-side at the edge.
+- **Double Payment Gateway Support.** Fully implements the bKash checkout flow alongside SSLCommerz / Stripe Test Mode options. Successful transactions route to `/payment/success` (printable receipt with transaction ID); aborted transactions route to `/payment/cancel`.
+- **Decoupled Architecture with TanStack Query.** Components remain purely presentational. All asynchronous queries, mutations, query key invalidations, and optimistic states live inside custom hooks (`src/hooks/`).
+- **Multi-Step Creation Wizard.** Property listing uses a 4-step React Hook Form + Zod wizard (`Basic info` ➔ `Location` ➔ `Images` ➔ `Amenities`) with client-side validation per step.
+- **URL State Synchronization.** Filtering, search terms, and pagination on `/browse` synchronize bi-directionally with URL query parameters (`useSearchParams`) for bookmarkable and shareable views.
+
+---
+
+## Scripts
+
 ```bash
-npm run build
-npm start
+npm run dev       # Start development server
+npm run build     # Production build
+npm run start     # Run production server
+npm run lint      # Run ESLint
+npm run typecheck # Run TypeScript compiler check
 ```
