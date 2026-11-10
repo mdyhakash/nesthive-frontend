@@ -9,8 +9,9 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { occupantsForRoom } from "@/data/rooms";
 import { formatBDT, formatDate } from "@/lib/format";
-import type { Property, Room } from "@/types";
+import type { Property, Room, RoomOccupant } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -172,7 +173,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
             </h2>
             {occupants.length > 0 ? (
               <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-                {occupants.map((o) => (
+                {occupants.map((o: RoomOccupant) => (
                   <li key={o.id} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
                     <UserAvatar name={o.name} size="md" />
                     <div className="min-w-0">

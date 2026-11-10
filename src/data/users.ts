@@ -6,10 +6,10 @@ export const getUser = (id: string) => users.find((u) => u.id === id);
 
 /** Fallback demo accounts if ever queried directly */
 export const demoAccounts: Record<Role, User> = {
-  TENANT: { id: "u-t1", name: "Tenant", email: "tenant@nesthive.com", role: "TENANT", status: "ACTIVE", emailVerified: true, createdAt: "2026-01-01T00:00:00Z" },
-  OWNER: { id: "u-o1", name: "Owner", email: "owner@nesthive.com", role: "OWNER", status: "ACTIVE", emailVerified: true, createdAt: "2026-01-01T00:00:00Z" },
-  MANAGER: { id: "u-m1", name: "Manager", email: "manager@nesthive.com", role: "MANAGER", status: "ACTIVE", emailVerified: true, createdAt: "2026-01-01T00:00:00Z" },
-  ADMIN: { id: "u-a1", name: "Admin", email: "admin@nesthive.com", role: "ADMIN", status: "ACTIVE", emailVerified: true, createdAt: "2026-01-01T00:00:00Z" },
+  TENANT: { id: "u-t1", name: "Tenant", email: "tenant@nesthive.com", phone: "+8801700000001", role: "TENANT", status: "ACTIVE", emailVerified: true, createdAt: "2026-01-01T00:00:00Z" },
+  OWNER: { id: "u-o1", name: "Owner", email: "owner@nesthive.com", phone: "+8801700000002", role: "OWNER", status: "ACTIVE", emailVerified: true, createdAt: "2026-01-01T00:00:00Z" },
+  MANAGER: { id: "u-m1", name: "Manager", email: "manager@nesthive.com", phone: "+8801700000003", role: "MANAGER", status: "ACTIVE", emailVerified: true, createdAt: "2026-01-01T00:00:00Z" },
+  ADMIN: { id: "u-a1", name: "Admin", email: "admin@nesthive.com", phone: "+8801700000004", role: "ADMIN", status: "ACTIVE", emailVerified: true, createdAt: "2026-01-01T00:00:00Z" },
 };
 
 export const tenantProfiles: TenantProfile[] = [];

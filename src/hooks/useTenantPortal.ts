@@ -4,6 +4,17 @@ import { viewingApi, type ViewingRequestItem } from "@/api/viewing.api";
 import { applicationApi, type ApplicationItem } from "@/api/application.api";
 import { useAuthStore } from "@/store/auth.store";
 import { extractData } from "@/lib/api-helper";
+import type {
+  Application,
+  Lease,
+  LeaseStatus,
+  MaintenanceTicket,
+  Notification,
+  Payment,
+  UtilityBill,
+  UtilitySplit,
+  ViewingRequest,
+} from "@/types";
 import { toast } from "sonner";
 
 export const TENANT_PORTAL_KEYS = {
@@ -80,13 +91,39 @@ export function useTenantPortal() {
   // Live active and past leases
   const rawLeases = extractData<LeaseItem[]>(leasesQuery.data);
   const liveLeases = Array.isArray(rawLeases) ? rawLeases : [];
-  const activeLease = liveLeases.find((l) => l.status === "ACTIVE") || null;
-  const pastLeases = liveLeases.filter((l) => l.status === "TERMINATED");
+
+  const mapLease = (l: LeaseItem): Lease => ({
+    id: l.id,
+    propertyId: l.room?.property?.id || "",
+    roomId: l.roomId,
+    tenantId: l.tenantId,
+    tenantName: l.tenant?.name || user?.name || "Tenant",
+    ownerId: l.room?.property?.ownerId || "",
+    status: (l.status === "EXPIRED" ? "TERMINATED" : l.status) as LeaseStatus,
+    startDate: l.startDate,
+    endDate: l.endDate,
+    deposit: Number(l.depositAmount || 0),
+    monthlyRent: Number(l.monthlyRent || 0),
+    rentDueDay: 5,
+    terms: l.terms
+      ? l.terms.split("\n").filter(Boolean)
+      : [
+          "Rent must be paid within the first 5 days of every month.",
+          "Quiet hours are 11:00 PM to 7:00 AM.",
+          "No subletting without written owner approval.",
+          "1-month written notice required prior to lease termination.",
+        ],
+    terminatedAt: (l as any).terminatedAt || (l.status === "TERMINATED" ? l.updatedAt : undefined),
+  });
+
+  const normalizedLeases: Lease[] = liveLeases.map(mapLease);
+  const activeLease = normalizedLeases.find((l) => l.status === "ACTIVE") || null;
+  const pastLeases = normalizedLeases.filter((l) => l.status === "TERMINATED");
 
   // Live viewing requests with normalized UI fields
   const rawViewings = extractData<ViewingRequestItem[]>(viewingsQuery.data);
   const liveViewings = Array.isArray(rawViewings) ? rawViewings : [];
-  const viewings = liveViewings.map((v) => ({
+  const viewings: ViewingRequest[] = liveViewings.map((v) => ({
     id: v.id,
     roomId: v.roomId,
     propertyId: v.room?.property?.id || "",
@@ -102,13 +139,14 @@ export function useTenantPortal() {
   // Live applications with normalized UI fields
   const rawApps = extractData<ApplicationItem[]>(applicationsQuery.data);
   const liveApplications = Array.isArray(rawApps) ? rawApps : [];
-  const applications = liveApplications.map((a) => ({
+  const applications: Application[] = liveApplications.map((a) => ({
     id: a.id,
     roomId: a.roomId,
     propertyId: a.room?.property?.id || "",
     tenantId: a.tenantId,
     tenantName: a.tenant?.name || user?.name || "Tenant",
     status: a.status as any,
+    message: "",
     moveInDate: a.proposedStartDate,
     createdAt: a.createdAt,
     updatedAt: a.updatedAt,
@@ -117,17 +155,17 @@ export function useTenantPortal() {
   return {
     id: user?.id || "",
     user,
-    lease: activeLease as any,
+    lease: activeLease,
     activeLease,
     pastLeases,
     viewings,
     applications,
-    payments: [],
-    dues: [],
-    tickets: [],
-    splits: [],
-    unpaidSplits: [],
-    notifications: [],
+    payments: [] as Payment[],
+    dues: [] as Payment[],
+    tickets: [] as MaintenanceTicket[],
+    splits: [] as { bill: UtilityBill; split: UtilitySplit }[],
+    unpaidSplits: [] as { bill: UtilityBill; split: UtilitySplit }[],
+    notifications: [] as Notification[],
     isLoading: leasesQuery.isLoading || viewingsQuery.isLoading || applicationsQuery.isLoading,
     cancelViewing: cancelViewingMutation.mutate,
     isCancellingViewing: cancelViewingMutation.isPending,

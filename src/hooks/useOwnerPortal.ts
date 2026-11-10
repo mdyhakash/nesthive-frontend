@@ -6,6 +6,19 @@ import { useAuthStore } from "@/store/auth.store";
 import { useMyProperties, useCreatePropertyMutation, useUpdatePropertyMutation, usePublishPropertyMutation, useDeletePropertyMutation } from "./useProperties";
 import { extractData } from "@/lib/api-helper";
 import type { PropertyItem } from "@/api/property.api";
+import type {
+  Application,
+  Lease,
+  LeaseStatus,
+  MaintenanceTicket,
+  Manager,
+  Notification,
+  Payment,
+  Property,
+  Room,
+  UtilityBill,
+  ViewingRequest,
+} from "@/types";
 import { toast } from "sonner";
 
 export const OWNER_PORTAL_KEYS = {
@@ -66,7 +79,7 @@ export function useOwnerPortal() {
   const rawProps = extractData<PropertyItem[]>(propertiesQuery.data);
   const liveProperties = Array.isArray(rawProps) ? rawProps : [];
 
-  const properties = liveProperties.map((p) => ({
+  const properties: Property[] = liveProperties.map((p) => ({
     id: p.id,
     ownerId: p.ownerId,
     managerId: p.managerId || undefined,
@@ -91,9 +104,42 @@ export function useOwnerPortal() {
     createdAt: p.createdAt,
   }));
 
+  const rooms: Room[] = liveProperties.flatMap((p) =>
+    (p.rooms || []).map((r: any) => ({
+      id: r.id,
+      propertyId: p.id,
+      name: `Room ${r.roomNumber || "1"}`,
+      type: (r.roomType === "SINGLE" ? "Single" : r.roomType === "SHARED" ? "Shared" : "Master bedroom") as any,
+      price: Number(r.rentAmount || 0),
+      isAvailable: (r.occupantCount || 0) < (r.capacity || 1),
+      isPublished: r.status === "PUBLISHED" || !r.isDeleted,
+      capacity: r.capacity || 1,
+      occupantCount: r.occupantCount || 0,
+      amenities: p.amenities || [],
+      images: p.images || [],
+      sizeSqft: 200,
+      genderPreference: "ANY" as const,
+    }))
+  );
+
   const rawLeases = extractData<LeaseItem[]>(leasesQuery.data);
   const liveLeases = Array.isArray(rawLeases) ? rawLeases : [];
-  const leases = liveLeases;
+  const leases: Lease[] = liveLeases.map((l) => ({
+    id: l.id,
+    propertyId: l.room?.property?.id || "",
+    roomId: l.roomId,
+    tenantId: l.tenantId,
+    tenantName: l.tenant?.name || "Tenant",
+    ownerId: l.room?.property?.ownerId || user?.id || "",
+    status: (l.status === "EXPIRED" ? "TERMINATED" : l.status) as LeaseStatus,
+    startDate: l.startDate,
+    endDate: l.endDate,
+    deposit: Number(l.depositAmount || 0),
+    monthlyRent: Number(l.monthlyRent || 0),
+    rentDueDay: 5,
+    terms: l.terms ? l.terms.split("\n").filter(Boolean) : [],
+    terminatedAt: (l as any).terminatedAt || (l.status === "TERMINATED" ? l.updatedAt : undefined),
+  }));
 
   return {
     id: user?.id || "",
@@ -110,15 +156,15 @@ export function useOwnerPortal() {
     },
     properties,
     allProperties: properties,
-    rooms: [],
-    viewings: [],
-    applications: [],
+    rooms,
+    viewings: [] as ViewingRequest[],
+    applications: [] as Application[],
     leases,
-    payments: [],
-    bills: [],
-    tickets: [],
-    managers: [],
-    notifications: [],
+    payments: [] as Payment[],
+    bills: [] as UtilityBill[],
+    tickets: [] as MaintenanceTicket[],
+    managers: [] as Manager[],
+    notifications: [] as Notification[],
     isLoading: propertiesQuery.isLoading || leasesQuery.isLoading,
 
     // Mutation triggers

@@ -101,7 +101,7 @@ export default function TenantLease() {
             <div className="grid content-start gap-4">
               <SectionCard title="Terms">
                 <ol className="grid gap-3">
-                  {lease.terms.map((term, i) => (
+                  {lease.terms.map((term: string, i: number) => (
                     <li key={i} className="flex gap-3 text-sm">
                       <span className="num flex size-6 shrink-0 items-center justify-center rounded-full bg-teal-soft text-xs font-semibold text-secondary">{i + 1}</span>
                       <span className="min-w-0 pt-0.5">{term}</span>
